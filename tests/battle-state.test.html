@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>BattleState Tests</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+    .pass { color: #2ecc71; }
+    .fail { color: #e74c3c; }
+    h2 { color: #f0c040; margin: 16px 0 8px; }
+  </style>
+</head>
+<body>
+  <h1>BattleState Tests</h1>
+  <div id="results"></div>
+  <script type="module">
+    import BattleState from '../battle/BattleState.js';
+
+    const results = document.getElementById('results');
+    let passed = 0, failed = 0;
+
+    function test(name, fn) {
+      try {
+        fn();
+        results.innerHTML += `<div class="pass">✓ ${name}</div>`;
+        passed++;
+      } catch (e) {
+        results.innerHTML += `<div class="fail">✗ ${name}: ${e.message}</div>`;
+        failed++;
+      }
+    }
+
+    function assert(condition, msg) {
+      if (!condition) throw new Error(msg || 'assertion failed');
+    }
+    function assertEqual(a, b) {
+      if (a !== b) throw new Error(`expected ${b}, got ${a}`);
+    }
+
+    results.innerHTML += '<h2>Stats initiales</h2>';
+    test('Hero démarre avec 100 PV', () => { const s = new BattleState(); assertEqual(s.heroHp, 100); assertEqual(s.heroMaxHp, 100); });
+    test('Goblin démarre avec 80 PV', () => { const s = new BattleState(); assertEqual(s.goblinHp, 80); assertEqual(s.goblinMaxHp, 80); });
+    test('Goblin ne se protège pas au départ', () => { const s = new BattleState(); assertEqual(s.goblinDefending, false); });
+
+    results.innerHTML += '<h2>Attaque héros</h2>';
+    test('heroAttack réduit les PV du goblin', () => {
+      const s = new BattleState();
+      const result = s.heroAttack();
+      assert(result.damage >= 18 && result.damage <= 25, `dégâts hors range: ${result.damage}`);
+      assertEqual(s.goblinHp, 80 - result.damage);
+    });
+    test('heroAttack avec goblin en défense divise les dégâts par 2', () => {
+      const s = new BattleState();
+      s.goblinDefending = true;
+      const result = s.heroAttack();
+      assert(result.blocked === true);
+      assertEqual(result.damage, Math.floor(result.rawDamage / 2));
+      assertEqual(s.goblinDefending, false);
+    });
+    test('heroAttack ne descend pas sous 0', () => {
+      const s = new BattleState(); s.goblinHp = 5; s.heroAttack(); assert(s.goblinHp >= 0);
+    });
+
+    results.innerHTML += '<h2>Soin héros</h2>';
+    test('heroHeal restaure 30 PV', () => {
+      const s = new BattleState(); s.heroHp = 50;
+      const result = s.heroHeal();
+      assertEqual(result.healed, 30); assertEqual(s.heroHp, 80);
+    });
+    test('heroHeal est plafonné au max', () => {
+      const s = new BattleState(); s.heroHp = 90;
+      const result = s.heroHeal();
+      assertEqual(s.heroHp, 100); assertEqual(result.healed, 10);
+    });
+    test('heroHeal à plein PV soigne 0', () => {
+      const s = new BattleState();
+      const result = s.heroHeal();
+      assertEqual(result.healed, 0); assertEqual(s.heroHp, 100);
+    });
+
+    results.innerHTML += '<h2>Attaque goblin</h2>';
+    test('goblinAttack réduit les PV du héros', () => {
+      const s = new BattleState();
+      const result = s.goblinAttack();
+      assert(result.damage >= 12 && result.damage <= 20, `dégâts hors range: ${result.damage}`);
+      assertEqual(s.heroHp, 100 - result.damage);
+    });
+
+    results.innerHTML += '<h2>Défense goblin</h2>';
+    test('goblinDefend active la défense', () => {
+      const s = new BattleState(); s.goblinDefend(); assertEqual(s.goblinDefending, true);
+    });
+    test('canGoblinDefend false après goblinDefend', () => {
+      const s = new BattleState(); s.goblinDefend(); assertEqual(s.canGoblinDefend(), false);
+    });
+    test('canGoblinDefend redevient true après goblinAttack', () => {
+      const s = new BattleState(); s.goblinDefend(); s.goblinAttack(); assertEqual(s.canGoblinDefend(), true);
+    });
+
+    results.innerHTML += '<h2>Conditions de fin</h2>';
+    test('isGoblinDead quand PV <= 0', () => { const s = new BattleState(); s.goblinHp = 0; assertEqual(s.isGoblinDead(), true); });
+    test('isHeroDead quand PV <= 0', () => { const s = new BattleState(); s.heroHp = 0; assertEqual(s.isHeroDead(), true); });
+    test('isGoblinDead false quand PV > 0', () => { const s = new BattleState(); assertEqual(s.isGoblinDead(), false); });
+
+    results.innerHTML += '<h2>IA Goblin</h2>';
+    test('goblinAI retourne attack ou defend', () => {
+      const s = new BattleState();
+      for (let i = 0; i < 50; i++) {
+        const a = s.goblinAI();
+        assert(a === 'attack' || a === 'defend', `action inconnue: ${a}`);
+      }
+    });
+    test('goblinAI attack si canGoblinDefend false', () => {
+      const s = new BattleState(); s.goblinDefend();
+      for (let i = 0; i < 50; i++) assertEqual(s.goblinAI(), 'attack');
+    });
+
+    results.innerHTML += `<h2>Résultat : ${passed} passés, ${failed} échoués</h2>`;
+  </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RPG Tactics</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Courier New', monospace;
+    }
+    #game-wrapper {
+      position: relative;
+      width: 800px;
+      height: 450px;
+    }
+    #game-container canvas {
+      display: block;
+      image-rendering: pixelated;
+    }
+    #ui-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 800px;
+      height: 110px;
+      background: linear-gradient(180deg, rgba(10,5,30,0.92) 0%, rgba(5,2,20,0.98) 100%);
+      border-top: 3px solid #8B6914;
+      box-shadow: inset 0 2px 0 #F0C040, inset 0 -1px 0 #4A3008;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 20px 12px;
+      gap: 8px;
+    }
+    #battle-message {
+      color: #E8D4A0;
+      font-size: 15px;
+      min-height: 20px;
+      letter-spacing: 0.5px;
+    }
+    #battle-message::before {
+      content: '▶ ';
+      color: #F0C040;
+    }
+    #action-buttons {
+      display: flex;
+      gap: 16px;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border: 2px solid #8B6914;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #1E1245 0%, #120B30 100%);
+      color: #E8D4A0;
+      transition: background 0.1s, transform 0.1s;
+      box-shadow: inset 0 1px 0 rgba(255,220,100,0.2), 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .action-btn:hover:not(:disabled) {
+      background: linear-gradient(180deg, #2A1A5E 0%, #1A0E40 100%);
+      border-color: #F0C040;
+      color: #FFFFFF;
+    }
+    .action-btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+    .action-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    #end-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    #end-overlay.visible { display: flex; }
+    #end-title {
+      font-size: 48px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px currentColor;
+    }
+    #end-title.victory { color: #F0C040; }
+    #end-title.defeat  { color: #E74C3C; }
+    #end-subtitle {
+      color: #E8D4A0;
+      font-size: 16px;
+    }
+    #replay-btn {
+      margin-top: 8px;
+      padding: 12px 32px;
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 2px solid #F0C040;
+      border-radius: 4px;
+      background: #1E1245;
+      color: #F0C040;
+      letter-spacing: 1px;
+    }
+    #replay-btn:hover { background: #2A1A5E; }
+  </style>
+</head>
+<body>
+  <div id="game-wrapper">
+    <div id="game-container"></div>
+    <div id="ui-overlay">
+      <div id="battle-message">Choisissez une action...</div>
+      <div id="action-buttons">
+        <button class="action-btn" id="btn-attack">⚔ Attaquer</button>
+        <button class="action-btn" id="btn-heal">✚ Se soigner</button>
+      </div>
+    </div>
+    <div id="end-overlay">
+      <div id="end-title">Victoire !</div>
+      <div id="end-subtitle">Le gobelin est vaincu !</div>
+      <button id="replay-btn">↺ Rejouer</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
