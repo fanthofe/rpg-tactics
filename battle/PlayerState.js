@@ -59,9 +59,6 @@ export default class PlayerState {
   }
 
   ownedIds() {
-    return [
-      ...this.inventory,
-      ...Object.values(this.equipped).filter(Boolean),
-    ];
+    return [...new Set([...this.inventory, ...Object.values(this.equipped).filter(Boolean)])];
   }
 }
