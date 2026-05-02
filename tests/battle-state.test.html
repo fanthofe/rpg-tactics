@@ -14,7 +14,8 @@
   <h1>BattleState Tests</h1>
   <div id="results"></div>
   <script type="module">
-    import BattleState from '../battle/BattleState.js';
+    import BattleState  from '../battle/BattleState.js';
+    import PlayerState  from '../battle/PlayerState.js';
 
     const results = document.getElementById('results');
     let passed = 0, failed = 0;
@@ -46,7 +47,8 @@
     test('heroAttack réduit les PV du goblin', () => {
       const s = new BattleState();
       const result = s.heroAttack();
-      assert(result.damage >= 18 && result.damage <= 25, `dégâts hors range: ${result.damage}`);
+      assert(result.rawDamage >= 18 && result.rawDamage <= 25, `rawDamage hors range: ${result.rawDamage}`);
+      assert(result.damage >= 18, `damage trop bas: ${result.damage}`);
       assertEqual(s.goblinHp, 80 - result.damage);
     });
     test('heroAttack avec goblin en défense divise les dégâts par 2', () => {
@@ -80,8 +82,9 @@
 
     results.innerHTML += '<h2>Attaque goblin</h2>';
     test('goblinAttack réduit les PV du héros', () => {
-      const s = new BattleState();
+      const s = new BattleState(); // SPD=8 → dodgeChance=0, DEF=0 → no reduction
       const result = s.goblinAttack();
+      assert(result.dodged === false, 'should not dodge at SPD=8');
       assert(result.damage >= 12 && result.damage <= 20, `dégâts hors range: ${result.damage}`);
       assertEqual(s.heroHp, 100 - result.damage);
     });
@@ -113,6 +116,64 @@
     test('goblinAI attack si canGoblinDefend false', () => {
       const s = new BattleState(); s.goblinDefend();
       for (let i = 0; i < 50; i++) assertEqual(s.goblinAI(), 'attack');
+    });
+
+    results.innerHTML += '<h2>Intégration PlayerState</h2>';
+    test('BattleState utilise heroMaxHp de PlayerState', () => {
+      const p = new PlayerState();
+      p.equip('helmet-iron', 'helmet'); // +10 HP
+      const s = new BattleState(p);
+      assertEqual(s.heroMaxHp, 110);
+      assertEqual(s.heroHp,    110);
+    });
+
+    test('BattleState sans PlayerState utilise les valeurs par défaut', () => {
+      const s = new BattleState();
+      assertEqual(s.heroMaxHp, 100);
+    });
+
+    test('heroAttack() crit : LCK=50 → toujours critique', () => {
+      const p = new PlayerState();
+      p.baseStats.lck = 50; // crit chance = 100%
+      const s = new BattleState(p);
+      s.goblinHp = 999;
+      const result = s.heroAttack();
+      assert(result.crit === true, 'should crit');
+      assert(result.damage >= 27, `damage=${result.damage}`); // min: floor(18*1.5)=27
+    });
+
+    test('heroAttack() pas de crit : LCK=0 → jamais critique', () => {
+      const p = new PlayerState();
+      p.baseStats.lck = 0;
+      const s = new BattleState(p);
+      s.goblinHp = 999;
+      for (let i = 0; i < 20; i++) {
+        const r = s.heroAttack();
+        assert(r.crit === false, `crit inattendu à i=${i}`);
+      }
+    });
+
+    test('goblinAttack() DEF=0 : aucune réduction', () => {
+      const p = new PlayerState(); // def=0
+      const s = new BattleState(p);
+      for (let i = 0; i < 20; i++) {
+        const r = s.goblinAttack();
+        if (r.dodged) continue;
+        assertEqual(r.damage, r.rawDamage);
+      }
+    });
+
+    test('goblinAttack() DEF=20 : réduit les dégâts de ~50%', () => {
+      const p = new PlayerState();
+      p.baseStats.def = 20; // réduction = 20/(20+20) = 0.5
+      const s = new BattleState(p);
+      s.heroHp = 9999;
+      for (let i = 0; i < 20; i++) {
+        const r = s.goblinAttack();
+        if (r.dodged) continue;
+        const expected = Math.floor(r.rawDamage * 0.5);
+        assertEqual(r.damage, expected);
+      }
     });
 
     results.innerHTML += `<h2>Résultat : ${passed} passés, ${failed} échoués</h2>`;
