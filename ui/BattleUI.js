@@ -1,11 +1,18 @@
 export default class BattleUI {
   constructor() {
-    this._btnAttack   = document.getElementById('btn-attack');
-    this._btnHeal     = document.getElementById('btn-heal');
-    this._msgEl       = document.getElementById('battle-message');
-    this._endOverlay  = document.getElementById('end-overlay');
-    this._endTitle    = document.getElementById('end-title');
-    this._endSubtitle = document.getElementById('end-subtitle');
+    this._btnAttack      = document.getElementById('btn-attack');
+    this._btnHeal        = document.getElementById('btn-heal');
+    this._btnSkills      = document.getElementById('btn-skills');
+    this._btnDoubleSlash = document.getElementById('btn-double-slash');
+    this._btnShield      = document.getElementById('btn-shield');
+    this._btnBack        = document.getElementById('btn-back');
+    this._actionButtons  = document.getElementById('action-buttons');
+    this._skillsPanel    = document.getElementById('skills-panel');
+    this._msgEl          = document.getElementById('battle-message');
+    this._endOverlay     = document.getElementById('end-overlay');
+    this._endTitle       = document.getElementById('end-title');
+    this._endSubtitle    = document.getElementById('end-subtitle');
+    this._menuBtn        = document.getElementById('menu-btn');
 
     this._btnAttack.addEventListener('click', () =>
       window.dispatchEvent(new CustomEvent('player-action', { detail: { action: 'attack' } }))
@@ -13,6 +20,16 @@ export default class BattleUI {
     this._btnHeal.addEventListener('click', () =>
       window.dispatchEvent(new CustomEvent('player-action', { detail: { action: 'heal' } }))
     );
+    this._btnSkills.addEventListener('click', () => this._showSkillsPanel());
+    this._btnBack.addEventListener('click',   () => this._showActionButtons());
+    this._btnDoubleSlash.addEventListener('click', () => {
+      this._showActionButtons();
+      window.dispatchEvent(new CustomEvent('player-action', { detail: { action: 'double-slash' } }));
+    });
+    this._btnShield.addEventListener('click', () => {
+      this._showActionButtons();
+      window.dispatchEvent(new CustomEvent('player-action', { detail: { action: 'shield' } }));
+    });
 
     window.addEventListener('animation-start',  () => this.setButtonsEnabled(false));
     window.addEventListener('animation-end',    () => this.setButtonsEnabled(true));
@@ -20,9 +37,25 @@ export default class BattleUI {
     window.addEventListener('battle-message',   (e) => this.setMessage(e.detail.text));
   }
 
+  _showSkillsPanel() {
+    this._actionButtons.style.display = 'none';
+    this._skillsPanel.classList.add('visible');
+  }
+
+  _showActionButtons() {
+    this._skillsPanel.classList.remove('visible');
+    this._actionButtons.style.display = 'flex';
+  }
+
   setButtonsEnabled(enabled) {
-    this._btnAttack.disabled = !enabled;
-    this._btnHeal.disabled   = !enabled;
+    this._btnAttack.disabled      = !enabled;
+    this._btnHeal.disabled        = !enabled;
+    this._btnSkills.disabled      = !enabled;
+    this._btnDoubleSlash.disabled = !enabled;
+    this._btnShield.disabled      = !enabled;
+    this._btnBack.disabled        = !enabled;
+    this._menuBtn.disabled        = !enabled;
+    if (!enabled) this._showActionButtons();
   }
 
   setMessage(text) {
@@ -36,6 +69,7 @@ export default class BattleUI {
     this._endSubtitle.textContent = winner === 'hero'
       ? 'Le gobelin est vaincu !'
       : 'Vous avez été vaincu...';
+    this._menuBtn.style.display = winner === 'goblin' ? 'inline-block' : 'none';
     this._endOverlay.classList.add('visible');
   }
 
