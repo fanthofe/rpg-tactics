@@ -1,10 +1,11 @@
 import {
   createHeroIdleSheet, createHeroWalkSheet,
-  createHeroAttackSheet, createHeroHealSheet,
+  createHeroAttackSheet, createHeroHealSheet, createHeroShieldSheet,
   createGoblinIdleSheet, createGoblinWalkSheet,
   createGoblinAttackSheet, createGoblinDefendSheet,
 } from '../assets/sprites.js';
 import BattleState from '../battle/BattleState.js';
+import { rollLoot } from '../battle/items.js';
 
 export default class BattleScene extends Phaser.Scene {
   constructor() {
@@ -30,12 +31,14 @@ export default class BattleScene extends Phaser.Scene {
       'hero-walk':    createHeroWalkSheet(),
       'hero-attack':  createHeroAttackSheet(),
       'hero-heal':    createHeroHealSheet(),
+      'hero-shield':  createHeroShieldSheet(),
       'goblin-idle':  createGoblinIdleSheet(),
       'goblin-walk':  createGoblinWalkSheet(),
       'goblin-attack':createGoblinAttackSheet(),
       'goblin-defend':createGoblinDefendSheet(),
     };
     Object.entries(sheets).forEach(([key, sheet]) => {
+      if (this.textures.exists(key)) return;
       this.textures.addSpriteSheet(key, sheet.canvas, {
         frameWidth:  sheet.frameWidth,
         frameHeight: sheet.frameHeight,
@@ -44,7 +47,7 @@ export default class BattleScene extends Phaser.Scene {
   }
 
   create() {
-    this._state            = new BattleState();
+    this._state            = new BattleState(window.playerState ?? null);
     this._goblinTintActive = false;
 
     this._drawBackground();
@@ -115,6 +118,7 @@ export default class BattleScene extends Phaser.Scene {
       { key: 'hero-walk',     frameRate:  8, repeat: -1 },
       { key: 'hero-attack',   frameRate: 12, repeat:  0 },
       { key: 'hero-heal',     frameRate:  6, repeat:  0 },
+      { key: 'hero-shield',   frameRate:  6, repeat:  0 },
       { key: 'goblin-idle',   frameRate:  4, repeat: -1 },
       { key: 'goblin-walk',   frameRate:  8, repeat: -1 },
       { key: 'goblin-attack', frameRate: 12, repeat:  0 },
@@ -245,16 +249,23 @@ export default class BattleScene extends Phaser.Scene {
   }
 
   _onPlayerAction(action) {
-    const msg = action === 'attack' ? 'Vous attaquez !' : 'Vous vous soignez !';
-    this.showMessage(msg);
+    const msgs = {
+      'attack':       'Vous attaquez !',
+      'double-slash': '⚔⚔ Double Slash !',
+      'shield':       '🛡 Bouclier du Guerrier !',
+      'heal':         'Vous vous soignez !',
+    };
+    this.showMessage(msgs[action] || 'Action !');
 
     this.time.delayedCall(350, () => {
       this._executeHeroTurn(action, () => {
         if (this._state.isGoblinDead()) {
           this.showMessage('Le Gobelin est vaincu !');
-          this.time.delayedCall(900, () =>
-            window.dispatchEvent(new CustomEvent('battle-end', { detail: { winner: 'hero' } }))
-          );
+          this.time.delayedCall(1200, () => {
+            const loot = window.playerState ? this._generateLoot() : null;
+            if (loot) window.playerState.addToInventory(loot);
+            this.scene.start('MenuScene', loot ? { loot } : {});
+          });
           return;
         }
         this.time.delayedCall(450, () => this._executeGoblinTurn());
@@ -281,6 +292,10 @@ export default class BattleScene extends Phaser.Scene {
         this._updateHpBars();
         cb();
       });
+    } else if (action === 'double-slash') {
+      this._animHeroDoubleSlash(cb);
+    } else if (action === 'shield') {
+      this._animHeroShield(cb);
     } else {
       this._animHeroHeal(() => {
         const result = this._state.heroHeal();
@@ -346,6 +361,90 @@ export default class BattleScene extends Phaser.Scene {
     hero.once('animationcomplete-hero-heal', () => hero.play('hero-idle'));
   }
 
+  _animHeroDoubleSlash(cb) {
+    if (this._goblinTintActive) {
+      this._goblin.clearTint();
+      this._goblinTintActive = false;
+    }
+
+    const hero   = this._hero;
+    const goblin = this._goblin;
+    const baseX  = this._heroBaseX;
+
+    const doHit = (yOffset, next) => {
+      hero.play('hero-attack');
+      hero.once('animationcomplete-hero-attack', () => {
+        goblin.setTint(0xffffff);
+        this.time.delayedCall(80, () => goblin.clearTint());
+        this.tweens.add({ targets: goblin, x: this._goblinBaseX + 12, duration: 70, yoyo: true });
+
+        const result = this._state.heroAttack();
+        const text   = result.blocked ? `🛡 -${result.damage}` : `-${result.damage}`;
+        const color  = result.blocked ? '#E67E22' : '#E74C3C';
+        this.floatText(goblin.x, goblin.y - 30 + yOffset, text, color);
+        this._updateHpBars();
+        next();
+      });
+    };
+
+    hero.play('hero-walk');
+    this.tweens.add({
+      targets: hero, x: baseX + 80,
+      duration: 200, ease: 'Sine.easeOut',
+      onComplete: () => {
+        doHit(0, () => {
+          if (this._state.isGoblinDead()) {
+            this.time.delayedCall(120, () => {
+              hero.play('hero-walk');
+              this.tweens.add({
+                targets: hero, x: baseX, duration: 180, ease: 'Sine.easeIn',
+                onComplete: () => { hero.play('hero-idle'); cb(); },
+              });
+            });
+            return;
+          }
+          this.time.delayedCall(260, () => {
+            doHit(-20, () => {
+              this.time.delayedCall(120, () => {
+                hero.play('hero-walk');
+                this.tweens.add({
+                  targets: hero, x: baseX, duration: 180, ease: 'Sine.easeIn',
+                  onComplete: () => { hero.play('hero-idle'); cb(); },
+                });
+              });
+            });
+          });
+        });
+      },
+    });
+  }
+
+  _animHeroShield(cb) {
+    const hero = this._hero;
+    this._state.heroShield();
+
+    hero.play('hero-shield');
+    hero.setTint(0xF0C040);
+
+    const glow = this.add.graphics();
+    this.tweens.add({
+      targets: { v: 0 }, v: 1,
+      duration: 500, yoyo: true,
+      onUpdate: (tween) => {
+        const a = tween.getValue();
+        glow.clear();
+        glow.fillStyle(0xF0C040, 0.35 * a);
+        glow.fillCircle(hero.x, hero.y, 55 * a + 20);
+      },
+      onComplete: () => glow.destroy(),
+    });
+
+    hero.once('animationcomplete-hero-shield', () => {
+      hero.play('hero-idle');
+      cb();
+    });
+  }
+
   // ─── GOBLIN TURN ─────────────────────────────────────────────────────────────
 
   _executeGoblinTurn() {
@@ -356,7 +455,19 @@ export default class BattleScene extends Phaser.Scene {
       this.time.delayedCall(400, () => {
         this._animGoblinAttack(() => {
           const result = this._state.goblinAttack();
-          this.floatText(this._hero.x, this._hero.y - 30, `-${result.damage}`, '#E74C3C');
+          if (result.dodged) {
+            this.showMessage('💨 Esquivé !');
+            this.floatText(this._hero.x, this._hero.y - 30, 'Esquivé !', '#FFCA28');
+          } else if (result.shieldAbsorbed) {
+            const msg = this._state.heroShieldActive
+              ? '🛡 Bouclier actif ! Dégâts réduits.'
+              : '🛡 Bouclier rompu ! Dégâts réduits.';
+            this.showMessage(msg);
+            this.floatText(this._hero.x, this._hero.y - 30, `🛡 -${result.damage}`, '#F0C040');
+            if (!this._state.heroShieldActive) this._hero.clearTint();
+          } else {
+            this.floatText(this._hero.x, this._hero.y - 30, `-${result.damage}`, '#E74C3C');
+          }
           this._updateHpBars();
 
           if (this._state.isHeroDead()) {
@@ -392,7 +503,10 @@ export default class BattleScene extends Phaser.Scene {
         goblin.play('goblin-attack');
         goblin.once('animationcomplete-goblin-attack', () => {
           hero.setTint(0xffffff);
-          this.time.delayedCall(80, () => hero.clearTint());
+          this.time.delayedCall(80, () => {
+            if (this._state.heroShieldActive) hero.setTint(0xF0C040);
+            else hero.clearTint();
+          });
 
           this.tweens.add({
             targets: hero, x: this._heroBaseX - 15,
@@ -413,6 +527,10 @@ export default class BattleScene extends Phaser.Scene {
         });
       },
     });
+  }
+
+  _generateLoot() {
+    return rollLoot(window.playerState?.ownedIds() ?? []);
   }
 
   _animGoblinDefend(onDefend) {
