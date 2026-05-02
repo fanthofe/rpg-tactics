@@ -115,6 +115,287 @@
       letter-spacing: 1px;
     }
     #replay-btn:hover { background: #2A1A5E; }
+    #skills-panel {
+      display: none;
+      gap: 16px;
+    }
+    #skills-panel.visible { display: flex; }
+    .skill-btn {
+      flex: 1;
+      padding: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border: 2px solid #6A4F9E;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #1A0E40 0%, #0E0828 100%);
+      color: #D4B8FF;
+      transition: background 0.1s, transform 0.1s;
+      box-shadow: inset 0 1px 0 rgba(180,140,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .skill-btn:hover:not(:disabled) {
+      background: linear-gradient(180deg, #2A1A60 0%, #180E38 100%);
+      border-color: #A080FF;
+      color: #FFFFFF;
+    }
+    .skill-btn:active:not(:disabled) { transform: translateY(1px); }
+    .skill-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #btn-back {
+      flex: 0 0 auto;
+      padding: 10px 18px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 2px solid #8B6914;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #1E1245 0%, #120B30 100%);
+      color: #E8D4A0;
+      transition: background 0.1s, transform 0.1s;
+    }
+    #btn-back:hover:not(:disabled) { background: #2A1A5E; border-color: #F0C040; }
+    #btn-back:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Menu overlay ─────────────────────────────────────────── */
+    #menu-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: linear-gradient(180deg, rgba(5,2,20,0.88) 0%, rgba(8,4,26,0.93) 100%);
+      border: 2px solid #8B6914;
+      box-sizing: border-box;
+      font-family: 'Courier New', monospace;
+    }
+    #menu-overlay.visible { display: flex; }
+
+    #menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px;
+      border-bottom: 2px solid #8B6914;
+      box-shadow: inset 0 -1px 0 #4A3008, 0 1px 0 #F0C040;
+      flex-shrink: 0;
+    }
+    .menu-title    { font-size: 13px; color: #F0C040; letter-spacing: 3px; text-transform: uppercase; }
+    .menu-subtitle { font-size: 10px; color: #8B6914; letter-spacing: 1px; }
+
+    #btn-fight {
+      padding: 7px 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: bold;
+      background: linear-gradient(180deg, #7B1FA2 0%, #4A0080 100%);
+      color: #fff;
+      border: 2px solid #F0C040;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(240,192,64,0.4);
+      letter-spacing: 1px;
+    }
+    #btn-fight:hover { background: linear-gradient(180deg, #9C27B0 0%, #6A0090 100%); }
+
+    #menu-body {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    #menu-character {
+      width: 200px;
+      flex-shrink: 0;
+      border-right: 1px solid #8B6914;
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #menu-equipment {
+      flex: 1;
+      border-right: 1px solid #8B6914;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    #menu-stats-inv {
+      width: 220px;
+      flex-shrink: 0;
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .menu-section-title {
+      font-size: 9px;
+      color: #F0C040;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    /* Equipment slots */
+    .equip-row { display: flex; align-items: center; gap: 8px; }
+    .equip-label {
+      width: 52px;
+      font-size: 9px;
+      color: #8B6914;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .equip-slot {
+      flex: 1;
+      padding: 7px 12px;
+      background: #0a0818;
+      border: 2px dashed #2a1a4a;
+      border-radius: 4px;
+      font-size: 10px;
+      color: #444;
+      cursor: default;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 34px;
+      transition: border-color 0.1s, background 0.1s;
+    }
+    .equip-slot.filled {
+      background: #1a0e40;
+      border: 1px solid #6A4F9E;
+      color: #D4B8FF;
+      cursor: grab;
+    }
+    .equip-slot.drag-over {
+      border-color: #F0C040;
+      background: #1a1040;
+    }
+
+    /* Inventory grid */
+    #inv-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+    .inv-cell {
+      aspect-ratio: 1;
+      background: #08040e;
+      border: 1px dashed #222;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .inv-cell.has-item {
+      background: #1a0e40;
+      border: 1px solid #546E7A;
+      cursor: grab;
+    }
+    .inv-cell.has-item.rarity-common { border-color: #546E7A; }
+    .inv-cell.has-item.rarity-rare   { border-color: #1565C0; box-shadow: 0 0 4px rgba(100,181,246,0.3); }
+    .inv-cell.has-item.rarity-epic   { border-color: #7B1FA2; box-shadow: 0 0 4px rgba(206,147,216,0.35); }
+    .inv-cell.dragging { opacity: 0.4; }
+    .inv-cell.drag-over { border-color: #F0C040; background: #1a1040; }
+
+    /* Stats list */
+    #stats-list { display: flex; flex-direction: column; gap: 4px; }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      border-bottom: 1px solid #111;
+      padding-bottom: 3px;
+    }
+    .stat-label { color: #aaa; }
+    .stat-value { color: #E8D4A0; }
+    .stat-bonus { color: #2ECC71; font-size: 8px; margin-left: 3px; }
+
+    /* Hero portrait in menu */
+    #menu-hero-portrait {
+      width: 100%;
+      max-height: 140px;
+      background: linear-gradient(180deg, #1E1245, #0e082e);
+      border: 2px solid #E53935;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      overflow: hidden;
+    }
+    #menu-hero-canvas-wrapper {
+      width: 72px;
+      height: 96px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Loot overlay */
+    #loot-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    #loot-overlay.visible { display: flex; }
+    #loot-box {
+      background: linear-gradient(180deg, #0e082e, #08041a);
+      border: 2px solid #8B6914;
+      box-shadow: inset 0 1px 0 #F0C040, 0 0 30px rgba(240,192,64,0.2);
+      border-radius: 8px;
+      padding: 28px 36px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Courier New', monospace;
+    }
+    #loot-header    { font-size: 11px; color: #F0C040; letter-spacing: 3px; }
+    #loot-icon      { font-size: 48px; line-height: 1; }
+    #loot-name      { font-size: 18px; font-weight: bold; color: #E8D4A0; }
+    #loot-rarity    { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+    #loot-rarity.rarity-common { color: #B0BEC5; }
+    #loot-rarity.rarity-rare   { color: #64B5F6; }
+    #loot-rarity.rarity-epic   { color: #CE93D8; }
+    #loot-stats     { font-size: 11px; color: #aaa; }
+    #btn-loot-continue {
+      margin-top: 6px;
+      padding: 10px 28px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: bold;
+      background: #1E1245;
+      color: #F0C040;
+      border: 2px solid #F0C040;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+    #btn-loot-continue:hover { background: #2A1A5E; }
+
+    /* Menu return button */
+    #menu-btn {
+      padding: 10px 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 2px solid #8B6914;
+      border-radius: 4px;
+      background: #0e0820;
+      color: #E8D4A0;
+      letter-spacing: 1px;
+    }
+    #menu-btn:hover { background: #1E1245; border-color: #F0C040; }
   </style>
 </head>
 <body>
@@ -125,12 +406,43 @@
       <div id="action-buttons">
         <button class="action-btn" id="btn-attack">⚔ Attaquer</button>
         <button class="action-btn" id="btn-heal">✚ Se soigner</button>
+        <button class="action-btn" id="btn-skills">★ Compétences</button>
+      </div>
+      <div id="skills-panel">
+        <button class="skill-btn" id="btn-double-slash">⚔⚔ Double Slash</button>
+        <button class="skill-btn" id="btn-shield">🛡 Bouclier</button>
+        <button id="btn-back">← Retour</button>
       </div>
     </div>
+    <div id="menu-overlay">
+      <div id="menu-header">
+        <div class="menu-title">⚔ RPG Tactics</div>
+        <div class="menu-subtitle">MENU — ÉQUIPEMENT</div>
+        <button id="btn-fight">⚔ Combattre !</button>
+      </div>
+      <div id="menu-body">
+        <div id="menu-character"></div>
+        <div id="menu-equipment"></div>
+        <div id="menu-stats-inv"></div>
+      </div>
+    </div>
+
+    <div id="loot-overlay">
+      <div id="loot-box">
+        <div id="loot-header">🎁 RÉCOMPENSE !</div>
+        <div id="loot-icon"></div>
+        <div id="loot-name"></div>
+        <div id="loot-rarity"></div>
+        <div id="loot-stats"></div>
+        <button id="btn-loot-continue">Continuer →</button>
+      </div>
+    </div>
+
     <div id="end-overlay">
       <div id="end-title">Victoire !</div>
       <div id="end-subtitle">Le gobelin est vaincu !</div>
       <button id="replay-btn">↺ Rejouer</button>
+      <button id="menu-btn">⌂ Menu</button>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
