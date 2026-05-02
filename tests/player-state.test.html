@@ -126,6 +126,24 @@ test('isEquipped() returns false when item is not equipped', () => {
   assert(p.isEquipped('sword-iron') === false);
 });
 
+// ── ownedIds ──────────────────────────────────────────────────
+test('ownedIds() returns all inventory items when nothing equipped', () => {
+  const p = new PlayerState();
+  const ids = p.ownedIds();
+  assert(ids.includes('sword-iron'),    'sword-iron');
+  assert(ids.includes('armor-leather'), 'armor-leather');
+  assert(ids.includes('helmet-iron'),   'helmet-iron');
+  assert(ids.length === 3, `length=${ids.length}`);
+});
+
+test('ownedIds() includes equipped item and excludes it from double-counting', () => {
+  const p = new PlayerState();
+  p.equip('sword-iron', 'weapon');
+  const ids = p.ownedIds();
+  assert(ids.includes('sword-iron'), 'sword-iron in ownedIds');
+  assert(ids.filter(id => id === 'sword-iron').length === 1, 'not duplicated');
+});
+
 results.innerHTML += `<hr><b>${passed} passed, ${failed} failed</b>`;
 </script>
 </body>
