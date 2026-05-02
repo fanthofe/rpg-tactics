@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>PlayerState Tests</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #eee; padding: 20px; }
+    .pass { color: #2ECC71; } .fail { color: #E74C3C; }
+    h2 { color: #F0C040; }
+  </style>
+</head>
+<body>
+<h2>PlayerState Tests</h2>
+<div id="results"></div>
+<script type="module">
+import PlayerState from '../battle/PlayerState.js';
+
+const results = document.getElementById('results');
+let passed = 0, failed = 0;
+
+function test(name, fn) {
+  try {
+    fn();
+    results.innerHTML += `<div class="pass">✓ ${name}</div>`;
+    passed++;
+  } catch (e) {
+    results.innerHTML += `<div class="fail">✗ ${name}: ${e.message}</div>`;
+    failed++;
+  }
+}
+
+function assert(condition, msg) {
+  if (!condition) throw new Error(msg ?? 'assertion failed');
+}
+
+// ── computedStats ──────────────────────────────────────────────
+test('computedStats() with no equipment returns baseStats', () => {
+  const p = new PlayerState();
+  const s = p.computedStats();
+  assert(s.hp === 100, `hp=${s.hp}`);
+  assert(s.atk === 18, `atk=${s.atk}`);
+  assert(s.def === 0,  `def=${s.def}`);
+  assert(s.spd === 8,  `spd=${s.spd}`);
+  assert(s.lck === 5,  `lck=${s.lck}`);
+});
+
+test('computedStats() adds weapon atk bonus', () => {
+  const p = new PlayerState();
+  p.equip('sword-iron', 'weapon'); // +6 ATK
+  assert(p.computedStats().atk === 24, `atk=${p.computedStats().atk}`);
+});
+
+test('computedStats() stacks multiple equipment bonuses', () => {
+  const p = new PlayerState();
+  p.equip('sword-iron', 'weapon');    // +6 ATK
+  p.equip('armor-leather', 'armor');  // +8 DEF
+  p.equip('helmet-iron', 'helmet');   // +4 DEF, +10 HP
+  const s = p.computedStats();
+  assert(s.atk === 24,  `atk=${s.atk}`);
+  assert(s.def === 12,  `def=${s.def}`);
+  assert(s.hp  === 110, `hp=${s.hp}`);
+});
+
+// ── equip ─────────────────────────────────────────────────────
+test('equip() moves item from inventory to slot', () => {
+  const p = new PlayerState();
+  assert(p.inventory.includes('sword-iron'));
+  p.equip('sword-iron', 'weapon');
+  assert(p.equipped.weapon === 'sword-iron');
+  assert(!p.inventory.includes('sword-iron'));
+});
+
+test('equip() returns previously equipped item to inventory', () => {
+  const p = new PlayerState();
+  p.equip('sword-iron', 'weapon');
+  p.inventory.push('sword-bronze');
+  p.equip('sword-bronze', 'weapon');
+  assert(p.equipped.weapon === 'sword-bronze');
+  assert(p.inventory.includes('sword-iron'), 'old item back in inventory');
+  assert(!p.inventory.includes('sword-bronze'));
+});
+
+// ── unequip ───────────────────────────────────────────────────
+test('unequip() moves item from slot back to inventory', () => {
+  const p = new PlayerState();
+  p.equip('sword-iron', 'weapon');
+  p.unequip('weapon');
+  assert(p.equipped.weapon === null);
+  assert(p.inventory.includes('sword-iron'));
+});
+
+test('unequip() on empty slot does nothing', () => {
+  const p = new PlayerState();
+  p.unequip('accessory1'); // no item there
+  assert(p.equipped.accessory1 === null);
+});
+
+// ── addToInventory ────────────────────────────────────────────
+test('addToInventory() adds item to inventory', () => {
+  const p = new PlayerState();
+  p.addToInventory('ring-speed');
+  assert(p.inventory.includes('ring-speed'));
+});
+
+test('addToInventory() removes oldest item when full (12 slots)', () => {
+  const p = new PlayerState();
+  p.inventory = [];
+  // Fill 12 slots
+  const ids = ['i0','i1','i2','i3','i4','i5','i6','i7','i8','i9','i10','i11'];
+  ids.forEach(id => p.inventory.push(id));
+  p.addToInventory('new-item');
+  assert(p.inventory.length === 12, `length=${p.inventory.length}`);
+  assert(!p.inventory.includes('i0'), 'oldest removed');
+  assert(p.inventory.includes('new-item'), 'new item added');
+});
+
+// ── isEquipped ────────────────────────────────────────────────
+test('isEquipped() returns true when item is in any slot', () => {
+  const p = new PlayerState();
+  p.equip('sword-iron', 'weapon');
+  assert(p.isEquipped('sword-iron') === true);
+});
+
+test('isEquipped() returns false when item is not equipped', () => {
+  const p = new PlayerState();
+  assert(p.isEquipped('sword-iron') === false);
+});
+
+results.innerHTML += `<hr><b>${passed} passed, ${failed} failed</b>`;
+</script>
+</body>
+</html>
