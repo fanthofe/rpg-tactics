@@ -24,7 +24,7 @@ export const ITEMS = {
 export const DROP_WEIGHTS = { common: 60, rare: 30, epic: 10 };
 
 // Pick a random loot item excluding already-owned ids
-export function rollLoot(ownedIds) {
+export function rollLoot(ownedIds = []) {
   const owned = new Set(ownedIds);
   const roll  = Math.random() * 100;
   const rarity = roll < 10 ? 'epic' : roll < 40 ? 'rare' : 'common';
