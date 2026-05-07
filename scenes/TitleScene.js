@@ -51,6 +51,7 @@ export default class TitleScene extends Phaser.Scene {
     }
 
     btnNew.onclick = () => {
+      titleEl.classList.remove('visible');
       window.playerState.resetProgress();
       window.playerState.save();
       this.scene.start('WorldMapScene');
@@ -60,6 +61,7 @@ export default class TitleScene extends Phaser.Scene {
       btnContinue.onclick = () => {
         const data = PlayerState.tryLoad();
         if (!data) return;
+        titleEl.classList.remove('visible');
         window.playerState.loadFromData(data);
         this.scene.start('WorldMapScene');
       };
