@@ -33,7 +33,7 @@ export default class BattleUI {
 
     window.addEventListener('animation-start',  () => this.setButtonsEnabled(false));
     window.addEventListener('animation-end',    () => this.setButtonsEnabled(true));
-    window.addEventListener('battle-end',       (e) => this.showEndScreen(e.detail.winner));
+    window.addEventListener('battle-end',       (e) => this.showEndScreen(e.detail));
     window.addEventListener('battle-message',   (e) => this.setMessage(e.detail.text));
   }
 
@@ -62,14 +62,23 @@ export default class BattleUI {
     this._msgEl.textContent = text;
   }
 
-  showEndScreen(winner) {
+  showEndScreen({ winner, allCleared = false }) {
     this.setButtonsEnabled(false);
-    this._endTitle.className      = winner === 'hero' ? 'victory' : 'defeat';
-    this._endTitle.textContent    = winner === 'hero' ? '⚔ Victoire !' : '💀 Défaite...';
-    this._endSubtitle.textContent = winner === 'hero'
-      ? 'Le gobelin est vaincu !'
-      : 'Vous avez été vaincu...';
-    this._menuBtn.style.display = winner === 'goblin' ? 'inline-block' : 'none';
+    const replayBtn = document.getElementById('replay-btn');
+
+    if (winner === 'hero' && allCleared) {
+      this._endTitle.className      = 'victory';
+      this._endTitle.textContent    = 'LÉGENDE !';
+      this._endSubtitle.textContent = 'Vous avez vaincu les 5 champions des Ombres !';
+      replayBtn.textContent         = 'Rejouer depuis le début';
+      this._menuBtn.style.display   = 'none';
+    } else {
+      this._endTitle.className      = 'defeat';
+      this._endTitle.textContent    = 'DÉFAITE';
+      this._endSubtitle.textContent = 'Vous avez été vaincu...';
+      replayBtn.textContent         = 'Réessayer';
+      this._menuBtn.style.display   = 'inline-block';
+    }
     this._endOverlay.classList.add('visible');
   }
 
