@@ -35,6 +35,38 @@ export default class PlayerState {
     this.equipped        = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null };
   }
 
+  save() {
+    const data = {
+      level:           this.level,
+      exp:             this.exp,
+      baseStats:       { ...this.baseStats },
+      clearedVillages: [...this.clearedVillages],
+      currentVillage:  this.currentVillage,
+      inventory:       [...this.inventory],
+      equipped:        { ...this.equipped },
+    };
+    localStorage.setItem('rpg-tactics-save', JSON.stringify(data));
+  }
+
+  static tryLoad() {
+    try {
+      const raw = localStorage.getItem('rpg-tactics-save');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  loadFromData(data) {
+    this.level           = data.level           ?? 1;
+    this.exp             = data.exp             ?? 0;
+    this.baseStats       = { ...data.baseStats };
+    this.clearedVillages = new Set(data.clearedVillages ?? []);
+    this.currentVillage  = data.currentVillage  ?? MAP_START;
+    this.inventory       = data.inventory       ?? ['sword-iron', 'armor-leather', 'helmet-iron'];
+    this.equipped        = { ...data.equipped };
+  }
+
   expToNext() {
     return EXP_TO_NEXT[this.level] ?? null; // null = max level
   }
