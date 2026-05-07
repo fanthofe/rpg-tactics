@@ -764,6 +764,173 @@
       background: rgba(124,58,237,0.3);
       box-shadow: 0 0 22px var(--primary-glow);
     }
+
+/* ── TITLE SCREEN ─────────────────────────────────────── */
+#title-screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  z-index: 40;
+}
+#title-screen.visible { display: flex; }
+
+#title-game-name {
+  font-family: 'Russo One', sans-serif;
+  font-size: 52px;
+  color: #A78BFA;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 18px rgba(167,139,250,0.8),
+    0 0 50px rgba(167,139,250,0.35);
+  line-height: 1;
+}
+#title-subtitle {
+  font-family: 'Chakra Petch', monospace;
+  font-size: 13px;
+  color: #64748B;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.title-btn {
+  padding: 12px 38px;
+  font-family: 'Russo One', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+#btn-new-game {
+  background: linear-gradient(180deg, #7C3AED 0%, #4C1D95 100%);
+  color: #fff;
+  border: 1.5px solid #A78BFA;
+  box-shadow: 0 0 18px rgba(124,58,237,0.55);
+}
+#btn-new-game:hover {
+  background: linear-gradient(180deg, #8B5CF6 0%, #6D28D9 100%);
+  box-shadow: 0 0 32px rgba(124,58,237,0.7);
+  transform: translateY(-1px);
+}
+#btn-continue {
+  background: rgba(255,255,255,0.04);
+  color: #64748B;
+  border: 1.5px solid rgba(100,116,139,0.35);
+  cursor: default;
+}
+#btn-continue.has-save {
+  color: #C4B5FD;
+  border-color: rgba(124,58,237,0.5);
+  background: rgba(124,58,237,0.1);
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(124,58,237,0.3);
+}
+#btn-continue.has-save:hover {
+  background: rgba(124,58,237,0.2);
+  box-shadow: 0 0 22px rgba(124,58,237,0.5);
+  transform: translateY(-1px);
+}
+#btn-no-save {
+  font-family: 'Chakra Petch', monospace;
+  font-size: 10px;
+  color: #334155;
+  letter-spacing: 2px;
+  margin-top: -12px;
+}
+
+/* ── MAP MENU BUTTON ──────────────────────────────────── */
+#btn-map-menu {
+  position: absolute;
+  bottom: 124px;
+  right: 12px;
+  padding: 8px 14px;
+  font-family: 'Chakra Petch', monospace;
+  font-size: 13px; letter-spacing: 1px;
+  background: rgba(124,58,237,0.15);
+  border: 1.5px solid var(--primary);
+  color: var(--text); border-radius: 3px;
+  cursor: pointer; z-index: 15;
+  box-shadow: 0 0 12px var(--primary-glow);
+  transition: all 0.15s ease;
+  display: none;
+}
+#btn-map-menu.visible { display: block; }
+#btn-map-menu:hover {
+  background: rgba(124,58,237,0.3);
+  box-shadow: 0 0 22px var(--primary-glow);
+}
+
+/* ── MAP CONFIRM OVERLAY ──────────────────────────────── */
+#map-confirm {
+  position: absolute;
+  inset: 0;
+  background: rgba(4,0,12,0.75);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 35;
+}
+#map-confirm.visible { display: flex; }
+
+#map-confirm-box {
+  background: linear-gradient(160deg, #0e0825 0%, #06000f 100%);
+  border: 1.5px solid var(--primary);
+  box-shadow: 0 0 24px rgba(124,58,237,0.4), inset 0 1px 0 rgba(167,139,250,0.15);
+  border-radius: 6px;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+#map-confirm-text {
+  font-size: 13px;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.6;
+}
+#map-confirm-text span {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 4px;
+}
+#map-confirm-btns { display: flex; gap: 12px; }
+#btn-confirm-yes {
+  padding: 9px 28px;
+  font-family: 'Russo One', sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  background: linear-gradient(180deg, #7C3AED 0%, #4C1D95 100%);
+  color: #fff; border: 1.5px solid #A78BFA; border-radius: 3px;
+  cursor: pointer; box-shadow: 0 0 16px rgba(124,58,237,0.5);
+  transition: all 0.15s ease;
+}
+#btn-confirm-yes:hover {
+  background: linear-gradient(180deg, #8B5CF6 0%, #6D28D9 100%);
+  box-shadow: 0 0 28px rgba(124,58,237,0.7);
+  transform: translateY(-1px);
+}
+#btn-confirm-no {
+  padding: 9px 24px;
+  font-family: 'Russo One', sans-serif;
+  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+  background: rgba(255,255,255,0.04);
+  color: var(--text-muted); border: 1.5px solid rgba(148,163,184,0.3);
+  border-radius: 3px; cursor: pointer;
+  transition: all 0.15s ease;
+}
+#btn-confirm-no:hover {
+  border-color: rgba(148,163,184,0.6);
+  color: var(--text);
+  background: rgba(255,255,255,0.08);
+}
   </style>
 </head>
 <body>
@@ -826,6 +993,29 @@
       <button id="btn-fight-village">Combattre</button>
     </div>
     <button id="btn-map-equip">⚙ Équipement</button>
+
+    <button id="btn-map-menu">⟵ Menu</button>
+
+    <div id="map-confirm">
+      <div id="map-confirm-box">
+        <div id="map-confirm-text">
+          Retourner au menu ?
+          <span>La progression est sauvegardée.</span>
+        </div>
+        <div id="map-confirm-btns">
+          <button id="btn-confirm-yes">Oui</button>
+          <button id="btn-confirm-no">Non</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="title-screen">
+      <div id="title-game-name">RPG TACTICS</div>
+      <div id="title-subtitle">Voyage à travers les clans</div>
+      <button class="title-btn" id="btn-new-game">Nouvelle partie</button>
+      <button class="title-btn" id="btn-continue">Continuer</button>
+      <div id="btn-no-save">Aucune sauvegarde</div>
+    </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
   <script type="module" src="game.js"></script>
