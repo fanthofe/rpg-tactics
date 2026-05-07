@@ -1,28 +1,39 @@
 import { ITEMS } from './items.js';
-import { BATTLE_SEQUENCE } from './enemies.js';
+import { VILLAGES, MAP_START } from './villages.js';
 import { EXP_TO_NEXT, STAT_GAINS, MAX_LEVEL } from './levels.js';
 
 export default class PlayerState {
   constructor() {
-    this.level        = 1;
-    this.exp          = 0;
-    this.battleIndex  = 0;
-    this.baseStats    = { hp: 55, atk: 10, def: 0, spd: 6, lck: 3 };
-    this.equipped     = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null };
-    this.inventory    = ['sword-iron', 'armor-leather', 'helmet-iron'];
+    this.level           = 1;
+    this.exp             = 0;
+    this.clearedVillages = new Set();
+    this.currentVillage  = MAP_START;
+    this.baseStats       = { hp: 55, atk: 10, def: 0, spd: 6, lck: 3 };
+    this.equipped        = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null };
+    this.inventory       = ['sword-iron', 'armor-leather', 'helmet-iron'];
   }
 
-  currentEnemyId() { return BATTLE_SEQUENCE[this.battleIndex] ?? null; }
-
-  advanceBattle() {
-    if (this.battleIndex < BATTLE_SEQUENCE.length - 1) {
-      this.battleIndex++;
-      return true;
-    }
-    return false; // all battles cleared
+  isVillageUnlocked(villageId) {
+    const v = VILLAGES[villageId];
+    if (!v) return false;
+    if (!v.parent) return true;
+    return this.clearedVillages.has(v.parent);
   }
 
-  resetBattles() { this.battleIndex = 0; }
+  clearVillage(villageId) {
+    this.clearedVillages.add(villageId);
+    this.currentVillage = villageId;
+  }
+
+  resetProgress() {
+    this.clearedVillages = new Set();
+    this.currentVillage  = MAP_START;
+    this.level           = 1;
+    this.exp             = 0;
+    this.baseStats       = { hp: 55, atk: 10, def: 0, spd: 6, lck: 3 };
+    this.inventory       = ['sword-iron', 'armor-leather', 'helmet-iron'];
+    this.equipped        = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null };
+  }
 
   expToNext() {
     return EXP_TO_NEXT[this.level] ?? null; // null = max level
