@@ -329,6 +329,7 @@ export default class WorldMapScene extends Phaser.Scene {
     this._closeVillagePanel();
     if (this._menuUI) this._menuUI.hide();
     document.getElementById('btn-map-equip').classList.remove('visible');
+    document.getElementById('btn-map-menu').classList.remove('visible');
     document.getElementById('ui-overlay').style.display = '';
 
     this.scene.start('BattleScene', { villageId, seqIdx: 0 });
