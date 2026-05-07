@@ -45,7 +45,9 @@ export default class PlayerState {
       inventory:       [...this.inventory],
       equipped:        { ...this.equipped },
     };
-    localStorage.setItem('rpg-tactics-save', JSON.stringify(data));
+    try {
+      localStorage.setItem('rpg-tactics-save', JSON.stringify(data));
+    } catch {}
   }
 
   static tryLoad() {
@@ -60,11 +62,11 @@ export default class PlayerState {
   loadFromData(data) {
     this.level           = data.level           ?? 1;
     this.exp             = data.exp             ?? 0;
-    this.baseStats       = { ...data.baseStats };
+    this.baseStats       = { hp: 55, atk: 10, def: 0, spd: 6, lck: 3, ...data.baseStats };
     this.clearedVillages = new Set(data.clearedVillages ?? []);
     this.currentVillage  = data.currentVillage  ?? MAP_START;
     this.inventory       = data.inventory       ?? ['sword-iron', 'armor-leather', 'helmet-iron'];
-    this.equipped        = { ...data.equipped };
+    this.equipped        = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null, ...data.equipped };
   }
 
   expToNext() {
