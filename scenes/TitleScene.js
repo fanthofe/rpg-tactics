@@ -59,13 +59,18 @@ export default class TitleScene extends Phaser.Scene {
     if (hasSave) {
       btnContinue.onclick = () => {
         const data = PlayerState.tryLoad();
-        if (data) window.playerState.loadFromData(data);
+        if (!data) return;
+        window.playerState.loadFromData(data);
         this.scene.start('WorldMapScene');
       };
+    } else {
+      btnContinue.onclick = null;
     }
   }
 
   shutdown() {
     document.getElementById('title-screen')?.classList.remove('visible');
+    document.getElementById('btn-new-game').onclick = null;
+    document.getElementById('btn-continue').onclick = null;
   }
 }
