@@ -4,170 +4,407 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RPG Tactics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Russo+One&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg:           #06000f;
+      --panel:        rgba(6, 0, 15, 0.96);
+      --primary:      #7C3AED;
+      --primary-dim:  #4C1D95;
+      --primary-glow: rgba(124, 58, 237, 0.55);
+      --accent:       #F43F5E;
+      --accent-glow:  rgba(244, 63, 94, 0.55);
+      --green:        #22C55E;
+      --green-glow:   rgba(34, 197, 94, 0.5);
+      --gold:         #FFB800;
+      --gold-glow:    rgba(255, 184, 0, 0.45);
+      --text:         #E2E8F0;
+      --text-muted:   #94A3B8;
+      --border:       rgba(124, 58, 237, 0.4);
+    }
+
+    @keyframes neon-pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.7; }
+    }
+    @keyframes btn-ready {
+      0%, 100% { box-shadow: 0 0 8px var(--glow-color, var(--primary-glow)), inset 0 1px 0 rgba(255,255,255,0.07); }
+      50%       { box-shadow: 0 0 18px var(--glow-color, var(--primary-glow)), inset 0 1px 0 rgba(255,255,255,0.07); }
+    }
+    @keyframes victory-in {
+      0%   { transform: scale(0.4) skewX(-8deg); opacity: 0; filter: blur(8px); }
+      60%  { transform: scale(1.12) skewX(2deg); opacity: 1; filter: blur(0); }
+      100% { transform: scale(1) skewX(0); }
+    }
+    @keyframes defeat-in {
+      0%   { transform: scale(1.4); opacity: 0; filter: blur(6px); }
+      100% { transform: scale(1); opacity: 1; filter: blur(0); }
+    }
+    @keyframes flicker {
+      0%, 95%, 100% { opacity: 1; }
+      96%            { opacity: 0.6; }
+      98%            { opacity: 0.9; }
+    }
+    @keyframes scan-line {
+      0%   { background-position: 0 0; }
+      100% { background-position: 0 100%; }
+    }
+    @keyframes shine {
+      0%   { left: -80%; }
+      100% { left: 120%; }
+    }
+    @keyframes hp-ghost-drain {
+      from { opacity: 0.7; }
+      to   { opacity: 0; }
+    }
+    @keyframes msg-in {
+      from { opacity: 0; transform: translateY(4px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes loot-drop {
+      0%   { transform: scale(0.6) translateY(-20px); opacity: 0; }
+      70%  { transform: scale(1.06) translateY(2px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); }
+    }
+    @keyframes rarity-glow {
+      0%, 100% { text-shadow: 0 0 8px currentColor; }
+      50%       { text-shadow: 0 0 22px currentColor, 0 0 40px currentColor; }
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      background: #0a0a1a;
+      background: radial-gradient(ellipse at 50% 30%, #1a0535 0%, var(--bg) 70%);
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      font-family: 'Courier New', monospace;
+      font-family: 'Chakra Petch', monospace;
+      overflow: hidden;
     }
+
+    /* ── WRAPPER ──────────────────────────────────────────────── */
     #game-wrapper {
       position: relative;
       width: 800px;
       height: 450px;
+      border-radius: 4px;
+      box-shadow:
+        0 0 0 1px var(--border),
+        0 0 30px var(--primary-glow),
+        0 0 80px rgba(124, 58, 237, 0.2),
+        0 20px 60px rgba(0,0,0,0.8);
+      overflow: hidden;
+      animation: flicker 8s infinite;
     }
+
     #game-container canvas {
       display: block;
       image-rendering: pixelated;
     }
+
+    /* Scanline overlay */
+    #game-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* ── BATTLE UI OVERLAY ────────────────────────────────────── */
     #ui-overlay {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 800px;
-      height: 110px;
-      background: linear-gradient(180deg, rgba(10,5,30,0.92) 0%, rgba(5,2,20,0.98) 100%);
-      border-top: 3px solid #8B6914;
-      box-shadow: inset 0 2px 0 #F0C040, inset 0 -1px 0 #4A3008;
+      height: 114px;
+      background: linear-gradient(180deg, rgba(6,0,15,0.88) 0%, rgba(4,0,10,0.98) 100%);
+      border-top: 2px solid var(--primary);
+      box-shadow: 0 -4px 24px var(--primary-glow), inset 0 1px 0 rgba(124,58,237,0.3);
       display: flex;
       flex-direction: column;
       padding: 10px 20px 12px;
+      gap: 9px;
+    }
+
+    /* ── MESSAGE ──────────────────────────────────────────────── */
+    #battle-message {
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      min-height: 20px;
+      animation: msg-in 0.18s ease-out;
+      display: flex;
+      align-items: center;
       gap: 8px;
     }
-    #battle-message {
-      color: #E8D4A0;
-      font-size: 15px;
-      min-height: 20px;
-      letter-spacing: 0.5px;
-    }
     #battle-message::before {
-      content: '▶ ';
-      color: #F0C040;
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+      flex-shrink: 0;
+      animation: neon-pulse 1.4s infinite;
     }
+
+    /* ── ACTION BUTTONS ───────────────────────────────────────── */
     #action-buttons {
       display: flex;
-      gap: 16px;
+      gap: 12px;
     }
+
     .action-btn {
       flex: 1;
       padding: 10px 0;
-      font-family: 'Courier New', monospace;
-      font-size: 16px;
-      font-weight: bold;
-      letter-spacing: 1px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 14px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
       cursor: pointer;
-      border: 2px solid #8B6914;
-      border-radius: 4px;
-      background: linear-gradient(180deg, #1E1245 0%, #120B30 100%);
-      color: #E8D4A0;
-      transition: background 0.1s, transform 0.1s;
-      box-shadow: inset 0 1px 0 rgba(255,220,100,0.2), 0 2px 4px rgba(0,0,0,0.5);
+      border-radius: 3px;
+      transition: all 0.12s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .action-btn:hover:not(:disabled) {
-      background: linear-gradient(180deg, #2A1A5E 0%, #1A0E40 100%);
-      border-color: #F0C040;
-      color: #FFFFFF;
+    .action-btn::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -80%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      transform: skewX(-20deg);
+      animation: shine 3.5s infinite;
     }
     .action-btn:active:not(:disabled) {
-      transform: translateY(1px);
+      transform: translateY(2px) scale(0.98);
     }
     .action-btn:disabled {
-      opacity: 0.4;
+      opacity: 0.3;
       cursor: not-allowed;
+      animation: none;
     }
+    .action-btn:disabled::after { display: none; }
+
+    #btn-attack {
+      --glow-color: var(--accent-glow);
+      background: linear-gradient(180deg, #2d0a14 0%, #1a0409 100%);
+      border: 1.5px solid var(--accent);
+      color: #FF8090;
+      box-shadow: 0 0 12px var(--accent-glow), inset 0 1px 0 rgba(244,63,94,0.2);
+      animation: btn-ready 2.4s infinite;
+    }
+    #btn-attack:hover:not(:disabled) {
+      background: linear-gradient(180deg, #4a0e1e 0%, #2a0810 100%);
+      border-color: #FF6070;
+      color: #FFFFFF;
+      box-shadow: 0 0 24px var(--accent-glow), 0 0 48px rgba(244,63,94,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+      transform: translateY(-1px);
+    }
+
+    #btn-heal {
+      --glow-color: var(--green-glow);
+      background: linear-gradient(180deg, #061a0d 0%, #030e07 100%);
+      border: 1.5px solid var(--green);
+      color: #6EE79A;
+      box-shadow: 0 0 12px var(--green-glow), inset 0 1px 0 rgba(34,197,94,0.2);
+      animation: btn-ready 2.8s infinite;
+    }
+    #btn-heal:hover:not(:disabled) {
+      background: linear-gradient(180deg, #0a2e15 0%, #061808 100%);
+      border-color: #4ADE80;
+      color: #FFFFFF;
+      box-shadow: 0 0 24px var(--green-glow), 0 0 48px rgba(34,197,94,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+      transform: translateY(-1px);
+    }
+
+    #btn-skills {
+      --glow-color: var(--primary-glow);
+      background: linear-gradient(180deg, #1a0a35 0%, #0e0520 100%);
+      border: 1.5px solid var(--primary);
+      color: #C4B5FD;
+      box-shadow: 0 0 12px var(--primary-glow), inset 0 1px 0 rgba(124,58,237,0.2);
+      animation: btn-ready 3.2s infinite;
+    }
+    #btn-skills:hover:not(:disabled) {
+      background: linear-gradient(180deg, #2e1460 0%, #1a0840 100%);
+      border-color: #A78BFA;
+      color: #FFFFFF;
+      box-shadow: 0 0 24px var(--primary-glow), 0 0 48px rgba(124,58,237,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+      transform: translateY(-1px);
+    }
+
+    /* ── SKILLS PANEL ─────────────────────────────────────────── */
+    #skills-panel {
+      display: none;
+      gap: 12px;
+    }
+    #skills-panel.visible { display: flex; }
+
+    .skill-btn {
+      flex: 1;
+      padding: 10px 0;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.12s ease;
+      background: linear-gradient(180deg, #1e0a40 0%, #120528 100%);
+      border: 1.5px solid #6D28D9;
+      color: #DDD6FE;
+      box-shadow: 0 0 10px rgba(109,40,217,0.4), inset 0 1px 0 rgba(167,139,250,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-btn::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -80%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transform: skewX(-20deg);
+      animation: shine 4s infinite;
+    }
+    .skill-btn:hover:not(:disabled) {
+      background: linear-gradient(180deg, #2e1460 0%, #1a0840 100%);
+      border-color: #A78BFA;
+      color: #FFFFFF;
+      box-shadow: 0 0 20px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
+      transform: translateY(-1px);
+    }
+    .skill-btn:active:not(:disabled) { transform: translateY(1px) scale(0.99); }
+    .skill-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    #btn-back {
+      flex: 0 0 auto;
+      padding: 10px 18px;
+      font-family: 'Chakra Petch', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(148,163,184,0.3);
+      color: var(--text-muted);
+      transition: all 0.12s ease;
+      letter-spacing: 1px;
+    }
+    #btn-back:hover:not(:disabled) {
+      border-color: rgba(148,163,184,0.6);
+      color: var(--text);
+      background: rgba(255,255,255,0.08);
+    }
+    #btn-back:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── END OVERLAY ──────────────────────────────────────────── */
     #end-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.75);
+      background: rgba(4, 0, 12, 0.85);
+      backdrop-filter: blur(4px);
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 14px;
+      z-index: 50;
     }
     #end-overlay.visible { display: flex; }
-    #end-title {
-      font-size: 48px;
-      font-weight: bold;
-      letter-spacing: 3px;
-      text-shadow: 0 0 20px currentColor;
-    }
-    #end-title.victory { color: #F0C040; }
-    #end-title.defeat  { color: #E74C3C; }
-    #end-subtitle {
-      color: #E8D4A0;
-      font-size: 16px;
-    }
-    #replay-btn {
-      margin-top: 8px;
-      padding: 12px 32px;
-      font-family: 'Courier New', monospace;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      border: 2px solid #F0C040;
-      border-radius: 4px;
-      background: #1E1245;
-      color: #F0C040;
-      letter-spacing: 1px;
-    }
-    #replay-btn:hover { background: #2A1A5E; }
-    #skills-panel {
-      display: none;
-      gap: 16px;
-    }
-    #skills-panel.visible { display: flex; }
-    .skill-btn {
-      flex: 1;
-      padding: 10px 0;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      cursor: pointer;
-      border: 2px solid #6A4F9E;
-      border-radius: 4px;
-      background: linear-gradient(180deg, #1A0E40 0%, #0E0828 100%);
-      color: #D4B8FF;
-      transition: background 0.1s, transform 0.1s;
-      box-shadow: inset 0 1px 0 rgba(180,140,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
-    }
-    .skill-btn:hover:not(:disabled) {
-      background: linear-gradient(180deg, #2A1A60 0%, #180E38 100%);
-      border-color: #A080FF;
-      color: #FFFFFF;
-    }
-    .skill-btn:active:not(:disabled) { transform: translateY(1px); }
-    .skill-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    #btn-back {
-      flex: 0 0 auto;
-      padding: 10px 18px;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      border: 2px solid #8B6914;
-      border-radius: 4px;
-      background: linear-gradient(180deg, #1E1245 0%, #120B30 100%);
-      color: #E8D4A0;
-      transition: background 0.1s, transform 0.1s;
-    }
-    #btn-back:hover:not(:disabled) { background: #2A1A5E; border-color: #F0C040; }
-    #btn-back:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ── Menu overlay ─────────────────────────────────────────── */
+    #end-title {
+      font-family: 'Russo One', sans-serif;
+      font-size: 58px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    #end-title.victory {
+      color: var(--gold);
+      text-shadow: 0 0 20px var(--gold-glow), 0 0 60px rgba(255,184,0,0.3);
+      animation: victory-in 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    #end-title.defeat {
+      color: var(--accent);
+      text-shadow: 0 0 20px var(--accent-glow), 0 0 60px rgba(244,63,94,0.3);
+      animation: defeat-in 0.4s ease-out forwards;
+    }
+
+    #end-subtitle {
+      color: var(--text-muted);
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    #replay-btn {
+      margin-top: 6px;
+      padding: 11px 36px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #1a0535 0%, #0e0020 100%);
+      border: 1.5px solid var(--primary);
+      color: #C4B5FD;
+      box-shadow: 0 0 16px var(--primary-glow);
+      transition: all 0.15s ease;
+    }
+    #replay-btn:hover {
+      background: linear-gradient(180deg, #2e0a5e 0%, #1a0040 100%);
+      border-color: #A78BFA;
+      color: #FFFFFF;
+      box-shadow: 0 0 28px var(--primary-glow);
+      transform: translateY(-1px);
+    }
+
+    #menu-btn {
+      padding: 10px 28px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(148,163,184,0.3);
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+    #menu-btn:hover {
+      border-color: rgba(148,163,184,0.6);
+      color: var(--text);
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ── MENU OVERLAY ─────────────────────────────────────────── */
     #menu-overlay {
       position: absolute;
       inset: 0;
       display: none;
       flex-direction: column;
-      background: linear-gradient(180deg, rgba(5,2,20,0.88) 0%, rgba(8,4,26,0.93) 100%);
-      border: 2px solid #8B6914;
-      box-sizing: border-box;
-      font-family: 'Courier New', monospace;
+      background: linear-gradient(160deg, #0e0825 0%, #06000f 60%, #120420 100%);
+      border: 1px solid var(--border);
+      font-family: 'Chakra Petch', monospace;
+      z-index: 20;
     }
     #menu-overlay.visible { display: flex; }
 
@@ -175,28 +412,46 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 20px;
-      border-bottom: 2px solid #8B6914;
-      box-shadow: inset 0 -1px 0 #4A3008, 0 1px 0 #F0C040;
+      padding: 9px 20px;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(124,58,237,0.2), 0 4px 16px rgba(0,0,0,0.4);
       flex-shrink: 0;
+      background: rgba(124,58,237,0.07);
     }
-    .menu-title    { font-size: 13px; color: #F0C040; letter-spacing: 3px; text-transform: uppercase; }
-    .menu-subtitle { font-size: 10px; color: #8B6914; letter-spacing: 1px; }
+    .menu-title {
+      font-family: 'Russo One', sans-serif;
+      font-size: 15px;
+      color: var(--primary);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px var(--primary-glow);
+    }
+    .menu-subtitle {
+      font-size: 9px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
 
     #btn-fight {
-      padding: 7px 24px;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      font-weight: bold;
-      background: linear-gradient(180deg, #7B1FA2 0%, #4A0080 100%);
+      padding: 8px 22px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #7C3AED 0%, #4C1D95 100%);
       color: #fff;
-      border: 2px solid #F0C040;
-      border-radius: 4px;
+      border: 1.5px solid #A78BFA;
+      border-radius: 3px;
       cursor: pointer;
-      box-shadow: 0 0 12px rgba(240,192,64,0.4);
-      letter-spacing: 1px;
+      box-shadow: 0 0 18px var(--primary-glow);
+      transition: all 0.15s ease;
     }
-    #btn-fight:hover { background: linear-gradient(180deg, #9C27B0 0%, #6A0090 100%); }
+    #btn-fight:hover {
+      background: linear-gradient(180deg, #8B5CF6 0%, #6D28D9 100%);
+      box-shadow: 0 0 32px var(--primary-glow);
+      transform: translateY(-1px);
+    }
 
     #menu-body {
       display: flex;
@@ -207,15 +462,15 @@
     #menu-character {
       width: 200px;
       flex-shrink: 0;
-      border-right: 1px solid #8B6914;
-      padding: 14px 14px;
+      border-right: 1px solid var(--border);
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
     #menu-equipment {
       flex: 1;
-      border-right: 1px solid #8B6914;
+      border-right: 1px solid var(--border);
       padding: 14px 18px;
       display: flex;
       flex-direction: column;
@@ -224,7 +479,7 @@
     #menu-stats-inv {
       width: 220px;
       flex-shrink: 0;
-      padding: 14px 14px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -232,10 +487,11 @@
 
     .menu-section-title {
       font-size: 9px;
-      color: #F0C040;
-      letter-spacing: 2px;
+      color: var(--primary);
+      letter-spacing: 3px;
       text-transform: uppercase;
       margin-bottom: 4px;
+      text-shadow: 0 0 8px var(--primary-glow);
     }
 
     /* Equipment slots */
@@ -243,16 +499,18 @@
     .equip-label {
       width: 52px;
       font-size: 9px;
-      color: #8B6914;
+      color: var(--text-muted);
       text-align: right;
       flex-shrink: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .equip-slot {
       flex: 1;
       padding: 7px 12px;
-      background: #0a0818;
-      border: 2px dashed #2a1a4a;
-      border-radius: 4px;
+      background: rgba(6,0,15,0.8);
+      border: 1.5px dashed rgba(124,58,237,0.25);
+      border-radius: 3px;
       font-size: 10px;
       color: #444;
       cursor: default;
@@ -260,17 +518,17 @@
       justify-content: space-between;
       align-items: center;
       min-height: 34px;
-      transition: border-color 0.1s, background 0.1s;
+      transition: border-color 0.15s, background 0.15s;
     }
     .equip-slot.filled {
-      background: #1a0e40;
-      border: 1px solid #6A4F9E;
-      color: #D4B8FF;
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.5);
+      color: #DDD6FE;
       cursor: grab;
     }
     .equip-slot.drag-over {
-      border-color: #F0C040;
-      background: #1a1040;
+      border-color: var(--gold);
+      background: rgba(255,184,0,0.08);
     }
 
     /* Inventory grid */
@@ -281,8 +539,8 @@
     }
     .inv-cell {
       aspect-ratio: 1;
-      background: #08040e;
-      border: 1px dashed #222;
+      background: rgba(6,0,15,0.8);
+      border: 1px dashed rgba(255,255,255,0.06);
       border-radius: 3px;
       display: flex;
       align-items: center;
@@ -290,43 +548,44 @@
       font-size: 18px;
     }
     .inv-cell.has-item {
-      background: #1a0e40;
-      border: 1px solid #546E7A;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.35);
       cursor: grab;
     }
-    .inv-cell.has-item.rarity-common { border-color: #546E7A; }
-    .inv-cell.has-item.rarity-rare   { border-color: #1565C0; box-shadow: 0 0 4px rgba(100,181,246,0.3); }
-    .inv-cell.has-item.rarity-epic   { border-color: #7B1FA2; box-shadow: 0 0 4px rgba(206,147,216,0.35); }
-    .inv-cell.dragging { opacity: 0.4; }
-    .inv-cell.drag-over { border-color: #F0C040; background: #1a1040; }
+    .inv-cell.has-item.rarity-common { border-color: rgba(84,110,122,0.6); }
+    .inv-cell.has-item.rarity-rare   { border-color: #1565C0; box-shadow: 0 0 5px rgba(100,181,246,0.3); }
+    .inv-cell.has-item.rarity-epic   { border-color: #7B1FA2; box-shadow: 0 0 5px rgba(206,147,216,0.4); }
+    .inv-cell.dragging { opacity: 0.3; }
+    .inv-cell.drag-over { border-color: var(--gold); background: rgba(255,184,0,0.08); }
 
-    /* Stats list */
+    /* Stats */
     #stats-list { display: flex; flex-direction: column; gap: 4px; }
     .stat-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 10px;
-      border-bottom: 1px solid #111;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
       padding-bottom: 3px;
     }
-    .stat-label { color: #aaa; }
-    .stat-value { color: #E8D4A0; }
-    .stat-bonus { color: #2ECC71; font-size: 8px; margin-left: 3px; }
+    .stat-label { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { color: var(--text); font-weight: 600; }
+    .stat-bonus { color: var(--green); font-size: 8px; margin-left: 3px; }
 
     /* Hero portrait in menu */
     #menu-hero-portrait {
       width: 100%;
       max-height: 140px;
-      background: linear-gradient(180deg, #1E1245, #0e082e);
-      border: 2px solid #E53935;
-      border-radius: 6px;
+      background: linear-gradient(180deg, rgba(124,58,237,0.15), rgba(6,0,15,0.8));
+      border: 1.5px solid var(--accent);
+      border-radius: 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 4px;
       overflow: hidden;
+      box-shadow: 0 0 12px rgba(244,63,94,0.2), inset 0 1px 0 rgba(244,63,94,0.15);
     }
     #menu-hero-canvas-wrapper {
       width: 72px;
@@ -335,90 +594,202 @@
       position: relative;
     }
 
-    /* Loot overlay */
+    /* ── LOOT OVERLAY ─────────────────────────────────────────── */
     #loot-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.82);
+      background: rgba(4, 0, 12, 0.88);
+      backdrop-filter: blur(6px);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 10;
+      z-index: 30;
     }
     #loot-overlay.visible { display: flex; }
+
     #loot-box {
-      background: linear-gradient(180deg, #0e082e, #08041a);
-      border: 2px solid #8B6914;
-      box-shadow: inset 0 1px 0 #F0C040, 0 0 30px rgba(240,192,64,0.2);
-      border-radius: 8px;
+      background: linear-gradient(160deg, #0e0825 0%, #06000f 100%);
+      border: 1.5px solid var(--primary);
+      box-shadow:
+        0 0 30px var(--primary-glow),
+        0 0 80px rgba(124,58,237,0.15),
+        inset 0 1px 0 rgba(167,139,250,0.2);
+      border-radius: 6px;
       padding: 28px 36px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      font-family: 'Courier New', monospace;
+      animation: loot-drop 0.45s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      overflow: hidden;
     }
-    #loot-header    { font-size: 11px; color: #F0C040; letter-spacing: 3px; }
+    #loot-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    #loot-header {
+      font-family: 'Russo One', sans-serif;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px var(--gold-glow);
+    }
     #loot-icon      { font-size: 48px; line-height: 1; }
-    #loot-name      { font-size: 18px; font-weight: bold; color: #E8D4A0; }
-    #loot-rarity    { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
-    #loot-rarity.rarity-common { color: #B0BEC5; }
-    #loot-rarity.rarity-rare   { color: #64B5F6; }
-    #loot-rarity.rarity-epic   { color: #CE93D8; }
-    #loot-stats     { font-size: 11px; color: #aaa; }
+    #loot-name      {
+      font-family: 'Russo One', sans-serif;
+      font-size: 18px;
+      color: var(--text);
+      letter-spacing: 1px;
+    }
+    #loot-rarity {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      animation: rarity-glow 2s infinite;
+    }
+    #loot-rarity.rarity-common { color: #94A3B8; }
+    #loot-rarity.rarity-rare   { color: #60A5FA; }
+    #loot-rarity.rarity-epic   { color: #C084FC; }
+    #loot-stats { font-size: 11px; color: var(--text-muted); }
+
     #btn-loot-continue {
       margin-top: 6px;
       padding: 10px 28px;
-      font-family: 'Courier New', monospace;
+      font-family: 'Russo One', sans-serif;
       font-size: 13px;
-      font-weight: bold;
-      background: #1E1245;
-      color: #F0C040;
-      border: 2px solid #F0C040;
-      border-radius: 4px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #1a0535 0%, #0e0020 100%);
+      color: var(--gold);
+      border: 1.5px solid var(--gold);
+      border-radius: 3px;
       cursor: pointer;
-      letter-spacing: 1px;
+      box-shadow: 0 0 14px var(--gold-glow);
+      transition: all 0.15s ease;
     }
-    #btn-loot-continue:hover { background: #2A1A5E; }
+    #btn-loot-continue:hover {
+      background: linear-gradient(180deg, #2a0840 0%, #180530 100%);
+      box-shadow: 0 0 26px var(--gold-glow);
+      transform: translateY(-1px);
+    }
 
-    /* Menu return button */
-    #menu-btn {
-      padding: 10px 24px;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      border: 2px solid #8B6914;
-      border-radius: 4px;
-      background: #0e0820;
-      color: #E8D4A0;
-      letter-spacing: 1px;
+    /* ── VILLAGE PANEL ────────────────────────────────────── */
+    #village-panel {
+      position: absolute;
+      bottom: 124px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      background: linear-gradient(160deg, #0e0825 0%, #06000f 100%);
+      border: 1.5px solid var(--primary);
+      box-shadow: 0 0 24px var(--primary-glow), inset 0 1px 0 rgba(167,139,250,0.15);
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 15;
     }
-    #menu-btn:hover { background: #1E1245; border-color: #F0C040; }
+    #village-panel.visible { display: flex; }
+
+    #village-panel-icon   { font-size: 32px; line-height: 1; }
+    #village-panel-name   {
+      font-family: 'Russo One', sans-serif;
+      font-size: 16px; color: var(--text);
+      letter-spacing: 2px; text-align: center;
+    }
+    #village-panel-diff   { font-size: 12px; color: var(--gold); letter-spacing: 2px; }
+    #village-panel-battles {
+      font-size: 10px; color: var(--text-muted);
+      letter-spacing: 1px; text-align: center;
+    }
+    #village-panel-status {
+      font-size: 10px; color: var(--green);
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    #btn-fight-village {
+      padding: 9px 28px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+      background: linear-gradient(180deg, #7C3AED 0%, #4C1D95 100%);
+      color: #fff; border: 1.5px solid #A78BFA; border-radius: 3px;
+      cursor: pointer; box-shadow: 0 0 18px var(--primary-glow);
+      transition: all 0.15s ease;
+    }
+    #btn-fight-village:hover {
+      background: linear-gradient(180deg, #8B5CF6 0%, #6D28D9 100%);
+      box-shadow: 0 0 32px var(--primary-glow); transform: translateY(-1px);
+    }
+    #btn-fight-village.soon {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(148,163,184,0.3);
+      color: var(--text-muted); cursor: default;
+      box-shadow: none;
+    }
+    #btn-fight-village.soon:hover { transform: none; box-shadow: none; }
+    #btn-close-village {
+      position: absolute; top: 8px; right: 10px;
+      background: none; border: none;
+      color: var(--text-muted); font-size: 14px;
+      cursor: pointer; padding: 4px 6px;
+    }
+    #btn-close-village:hover { color: var(--text); }
+
+    /* ── MAP EQUIPMENT BUTTON ─────────────────────────────── */
+    #btn-map-equip {
+      position: absolute;
+      bottom: 124px;
+      left: 12px;
+      padding: 8px 14px;
+      font-family: 'Chakra Petch', monospace;
+      font-size: 13px; letter-spacing: 1px;
+      background: rgba(124,58,237,0.15);
+      border: 1.5px solid var(--primary);
+      color: var(--text); border-radius: 3px;
+      cursor: pointer; z-index: 15;
+      box-shadow: 0 0 12px var(--primary-glow);
+      transition: all 0.15s ease;
+      display: none;
+    }
+    #btn-map-equip.visible { display: block; }
+    #btn-map-equip:hover {
+      background: rgba(124,58,237,0.3);
+      box-shadow: 0 0 22px var(--primary-glow);
+    }
   </style>
 </head>
 <body>
   <div id="game-wrapper">
     <div id="game-container"></div>
-    <div id="ui-overlay">
+    <div id="ui-overlay" style="display:none;">
       <div id="battle-message">Choisissez une action...</div>
       <div id="action-buttons">
-        <button class="action-btn" id="btn-attack">⚔ Attaquer</button>
-        <button class="action-btn" id="btn-heal">✚ Se soigner</button>
-        <button class="action-btn" id="btn-skills">★ Compétences</button>
+        <button class="action-btn" id="btn-attack">Attaquer</button>
+        <button class="action-btn" id="btn-heal">Se soigner</button>
+        <button class="action-btn" id="btn-skills">Compétences</button>
       </div>
       <div id="skills-panel">
-        <button class="skill-btn" id="btn-double-slash">⚔⚔ Double Slash</button>
-        <button class="skill-btn" id="btn-shield">🛡 Bouclier</button>
+        <button class="skill-btn" id="btn-double-slash">Double Slash</button>
+        <button class="skill-btn" id="btn-shield">Bouclier</button>
         <button id="btn-back">← Retour</button>
       </div>
     </div>
+
     <div id="menu-overlay">
       <div id="menu-header">
-        <div class="menu-title">⚔ RPG Tactics</div>
-        <div class="menu-subtitle">MENU — ÉQUIPEMENT</div>
-        <button id="btn-fight">⚔ Combattre !</button>
+        <div>
+          <div class="menu-title">RPG Tactics</div>
+          <div class="menu-subtitle">Équipement &amp; Inventaire</div>
+        </div>
+        <button id="btn-close-menu" style="padding:8px 18px;font-family:'Russo One',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;background:rgba(255,255,255,0.05);color:var(--text-muted);border:1.5px solid rgba(148,163,184,0.3);border-radius:3px;cursor:pointer;">Fermer</button>
       </div>
       <div id="menu-body">
         <div id="menu-character"></div>
@@ -429,21 +800,32 @@
 
     <div id="loot-overlay">
       <div id="loot-box">
-        <div id="loot-header">🎁 RÉCOMPENSE !</div>
+        <div id="loot-header">Récompense</div>
         <div id="loot-icon"></div>
         <div id="loot-name"></div>
         <div id="loot-rarity"></div>
         <div id="loot-stats"></div>
-        <button id="btn-loot-continue">Continuer →</button>
+        <button id="btn-loot-continue">Continuer</button>
       </div>
     </div>
 
     <div id="end-overlay">
       <div id="end-title">Victoire !</div>
       <div id="end-subtitle">Le gobelin est vaincu !</div>
-      <button id="replay-btn">↺ Rejouer</button>
-      <button id="menu-btn">⌂ Menu</button>
+      <button id="replay-btn">Rejouer</button>
+      <button id="menu-btn">Menu</button>
     </div>
+
+    <div id="village-panel">
+      <button id="btn-close-village">✕</button>
+      <div id="village-panel-icon">🏘</div>
+      <div id="village-panel-name">Hameau</div>
+      <div id="village-panel-diff">★☆☆☆☆</div>
+      <div id="village-panel-battles">2 combats</div>
+      <div id="village-panel-status"></div>
+      <button id="btn-fight-village">Combattre</button>
+    </div>
+    <button id="btn-map-equip">⚙ Équipement</button>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
   <script type="module" src="game.js"></script>
