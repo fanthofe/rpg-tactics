@@ -41,6 +41,8 @@ export default class TitleScene extends Phaser.Scene {
     const btnNew     = document.getElementById('btn-new-game');
 
     titleEl.classList.add('visible');
+    document.getElementById('btn-map-equip')?.classList.remove('visible');
+    document.getElementById('btn-map-menu')?.classList.remove('visible');
 
     if (hasSave) {
       btnContinue.classList.add('has-save');
