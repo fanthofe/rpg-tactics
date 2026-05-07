@@ -23,6 +23,7 @@ export default class PlayerState {
   clearVillage(villageId) {
     this.clearedVillages.add(villageId);
     this.currentVillage = villageId;
+    this.save();
   }
 
   resetProgress() {
@@ -92,7 +93,9 @@ export default class PlayerState {
       }
       levels.push({ level: this.level, gains: g ? { hp: g[0], atk: g[1], def: g[2], spd: g[3], lck: g[4] } : {} });
     }
-    return { leveled: levels.length > 0, levels };
+    const result = { leveled: levels.length > 0, levels };
+    if (result.leveled) this.save();
+    return result;
   }
 
   computedStats() {
@@ -127,6 +130,7 @@ export default class PlayerState {
     this.equipped[slot] = itemId;
     const idx = this.inventory.indexOf(itemId);
     if (idx !== -1) this.inventory.splice(idx, 1);
+    this.save();
   }
 
   unequip(slot) {
@@ -134,6 +138,7 @@ export default class PlayerState {
     if (!itemId) return;
     this.equipped[slot] = null;
     this.addToInventory(itemId);
+    this.save();
   }
 
   addToInventory(itemId) {
