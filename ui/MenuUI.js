@@ -1,4 +1,5 @@
 import { ITEMS } from '../battle/items.js';
+import { EXP_TO_NEXT, MAX_LEVEL } from '../battle/levels.js';
 
 export default class MenuUI {
   constructor(playerState) {
@@ -54,6 +55,10 @@ export default class MenuUI {
     const s  = this._state;
     const cs = s.computedStats();
 
+    const expToNext  = s.level >= MAX_LEVEL ? null : EXP_TO_NEXT[s.level];
+    const expRatio   = expToNext ? Math.min(1, s.exp / expToNext) : 1;
+    const expDisplay = expToNext ? `${s.exp} / ${expToNext}` : 'MAX';
+
     el.innerHTML = `
       <div class="menu-section-title">Personnage</div>
       <div id="menu-hero-portrait">
@@ -72,10 +77,13 @@ export default class MenuUI {
           <div style="width:100%;height:100%;background:linear-gradient(90deg,#2ECC71,#27AE60);border-radius:3px;"></div>
         </div>
       </div>
-      <div style="margin-top:auto;padding:8px;background:#08041a;border:1px solid #333;border-radius:4px;">
-        <div style="font-size:8px;color:#666;margin-bottom:3px;">PROCHAIN ENNEMI</div>
-        <div style="font-size:11px;color:#E74C3C;">👺 Gobelin</div>
-        <div style="font-size:9px;color:#aaa;">Niveau 1</div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#aaa;margin-bottom:3px;">
+          <span style="color:#F0C040;">✦ EXP</span><span style="color:#F0C040;">${expDisplay}</span>
+        </div>
+        <div style="height:4px;background:#1a1a2e;border-radius:2px;border:1px solid #333;overflow:hidden;">
+          <div style="width:${(expRatio * 100).toFixed(1)}%;height:100%;background:linear-gradient(90deg,#F0C040,#FF9800);border-radius:2px;transition:width 0.3s;"></div>
+        </div>
       </div>
     `;
   }
