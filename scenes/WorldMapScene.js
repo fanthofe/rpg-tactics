@@ -230,6 +230,11 @@ export default class WorldMapScene extends Phaser.Scene {
     if (this._animating) return;
     const ps = window.playerState;
 
+    if (villageId === ps.currentVillage) {
+      this._openVillagePanel(villageId);
+      return;
+    }
+
     const current = VILLAGES[ps.currentVillage];
     if (!current.connections.includes(villageId)) return;
     if (!ps.isVillageUnlocked(villageId)) return;
