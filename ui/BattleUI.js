@@ -54,7 +54,6 @@ export default class BattleUI {
     this._btnDoubleSlash.disabled = !enabled;
     this._btnShield.disabled      = !enabled;
     this._btnBack.disabled        = !enabled;
-    this._menuBtn.disabled        = !enabled;
     if (!enabled) this._showActionButtons();
   }
 
