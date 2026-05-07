@@ -1,11 +1,53 @@
 import { ITEMS } from './items.js';
+import { BATTLE_SEQUENCE } from './enemies.js';
+import { EXP_TO_NEXT, STAT_GAINS, MAX_LEVEL } from './levels.js';
 
 export default class PlayerState {
   constructor() {
-    this.level      = 1;
-    this.baseStats  = { hp: 100, atk: 18, def: 0, spd: 8, lck: 5 };
-    this.equipped   = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null };
-    this.inventory  = ['sword-iron', 'armor-leather', 'helmet-iron'];
+    this.level        = 1;
+    this.exp          = 0;
+    this.battleIndex  = 0;
+    this.baseStats    = { hp: 55, atk: 10, def: 0, spd: 6, lck: 3 };
+    this.equipped     = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null };
+    this.inventory    = ['sword-iron', 'armor-leather', 'helmet-iron'];
+  }
+
+  currentEnemyId() { return BATTLE_SEQUENCE[this.battleIndex] ?? null; }
+
+  advanceBattle() {
+    if (this.battleIndex < BATTLE_SEQUENCE.length - 1) {
+      this.battleIndex++;
+      return true;
+    }
+    return false; // all battles cleared
+  }
+
+  resetBattles() { this.battleIndex = 0; }
+
+  expToNext() {
+    return EXP_TO_NEXT[this.level] ?? null; // null = max level
+  }
+
+  gainExp(amount) {
+    if (this.level >= MAX_LEVEL) return { leveled: false, levels: [] };
+    this.exp += amount;
+    const levels = [];
+    while (this.level < MAX_LEVEL) {
+      const needed = EXP_TO_NEXT[this.level];
+      if (!needed || this.exp < needed) break;
+      this.exp -= needed;
+      this.level++;
+      const g = STAT_GAINS[this.level];
+      if (g) {
+        this.baseStats.hp  += g[0];
+        this.baseStats.atk += g[1];
+        this.baseStats.def += g[2];
+        this.baseStats.spd += g[3];
+        this.baseStats.lck += g[4];
+      }
+      levels.push({ level: this.level, gains: g ? { hp: g[0], atk: g[1], def: g[2], spd: g[3], lck: g[4] } : {} });
+    }
+    return { leveled: levels.length > 0, levels };
   }
 
   computedStats() {
