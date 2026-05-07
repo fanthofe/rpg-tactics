@@ -205,6 +205,9 @@ export default class WorldMapScene extends Phaser.Scene {
   _setupUI() {
     const equipBtn = document.getElementById('btn-map-equip');
     equipBtn.classList.add('visible');
+    const menuBtn = document.getElementById('btn-map-menu');
+    menuBtn.classList.add('visible');
+    menuBtn.onclick = () => this._showMenuConfirm();
     this._menuUI = new MenuUI(window.playerState);
 
     equipBtn.onclick = () => this._menuUI.show();
@@ -213,11 +216,19 @@ export default class WorldMapScene extends Phaser.Scene {
     document.getElementById('btn-close-village').onclick = () => this._closeVillagePanel();
     document.getElementById('btn-fight-village').onclick = () => this._startBattle();
 
+    document.getElementById('btn-confirm-yes').onclick = () => {
+      this._hideMenuConfirm();
+      this.scene.start('TitleScene');
+    };
+    document.getElementById('btn-confirm-no').onclick = () => this._hideMenuConfirm();
+
     document.getElementById('ui-overlay').style.display = 'none';
   }
 
   shutdown() {
     document.getElementById('btn-map-equip')?.classList.remove('visible');
+    document.getElementById('btn-map-menu')?.classList.remove('visible');
+    this._hideMenuConfirm();
     this._closeVillagePanel();
     if (this._menuUI) this._menuUI.hide();
     Object.values(this._nodeZones).forEach(z => z.destroy());
@@ -321,6 +332,16 @@ export default class WorldMapScene extends Phaser.Scene {
     document.getElementById('ui-overlay').style.display = '';
 
     this.scene.start('BattleScene', { villageId, seqIdx: 0 });
+  }
+
+  // ── Menu confirmation ──────────────────────────────────────────────────────
+
+  _showMenuConfirm() {
+    document.getElementById('map-confirm').classList.add('visible');
+  }
+
+  _hideMenuConfirm() {
+    document.getElementById('map-confirm').classList.remove('visible');
   }
 
   // ── Loot display ───────────────────────────────────────────────────────────
