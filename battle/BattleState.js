@@ -58,6 +58,16 @@ export default class BattleState {
 
     // Cave Troll / King
     this._trollTurnCounter  = 0;
+
+    // Pirate Grunt
+    this.pillageStacks      = 0;
+
+    // Pirate Quartermaster
+    this.heroPoisoned       = false;
+    this.heroPoisonDamage   = 0;
+
+    // Pirate Captain
+    this._captainTurnCounter = 0;
   }
 
   // ── Hero actions ──────────────────────────────────────────────────────────
@@ -134,6 +144,10 @@ export default class BattleState {
       case 'cave_miner':      return this._caveMinerAI();
       case 'cave_troll':      return this._caveTrollAI();
       case 'cave_troll_king': return this._caveTrollKingAI();
+      case 'pirate_grunt':         return 'attack';
+      case 'pirate_crew':          return 'attack';
+      case 'pirate_quartermaster': return this._pirateQmAI();
+      case 'pirate_captain':       return this._pirateCaptainAI();
       default:           return this._goblinAI();
     }
   }
@@ -148,6 +162,10 @@ export default class BattleState {
       case 'cave_miner':      return [this._basicEnemyAttack()];
       case 'cave_troll':      return [this._trollDoAttack()];
       case 'cave_troll_king': return [this._trollDoAttack()];
+      case 'pirate_grunt':         return [this._pirateGruntDoAttack()];
+      case 'pirate_crew':          return this._gnollsDoAttack();
+      case 'pirate_quartermaster': return [this._basicEnemyAttack()];
+      case 'pirate_captain':       return [this._basicEnemyAttack()];
       default:           return [this._basicEnemyAttack()];
     }
   }
@@ -185,6 +203,9 @@ export default class BattleState {
     if (this.heroCursed) {
       this._heroCurseTurns--;
       if (this._heroCurseTurns <= 0) this.heroCursed = false;
+    }
+    if (this.heroPoisoned && this.heroPoisonDamage > 0) {
+      this.heroHp = Math.max(0, this.heroHp - this.heroPoisonDamage);
     }
   }
 
@@ -264,6 +285,25 @@ export default class BattleState {
     this.enemyHp += healed;
     result.trollRegen = healed;
     return result;
+  }
+
+  _pirateGruntDoAttack() {
+    const cfg   = this._config;
+    const bonus = this.pillageStacks * (cfg.pillageAtkBonus ?? 8);
+    const range = cfg.atkMax - cfg.atkMin;
+    const raw   = cfg.atkMin + Math.floor(Math.random() * (range + 1)) + bonus;
+    const result = this._applyDamageToHero(raw);
+    if (!result.dodged && this.pillageStacks < (cfg.pillageMaxStacks ?? 3)) {
+      this.pillageStacks++;
+      result.pillaged = true;
+    }
+    return result;
+  }
+
+  cannonball() {
+    const dmg  = this._config.cannonballDamage ?? 55;
+    this.heroHp = Math.max(0, this.heroHp - dmg);
+    return { damage: dmg };
   }
 
   explosion() {
@@ -372,6 +412,23 @@ export default class BattleState {
     this._trollTurnCounter++;
     if (this._trollTurnCounter % (this._config.quakeCycle ?? 3) === 0) return 'quake';
     return 'attack';
+  }
+
+  _pirateQmAI() {
+    if (!this.heroPoisoned) {
+      this.heroPoisoned     = true;
+      this.heroPoisonDamage = this._config.poisonDamage ?? 8;
+      return 'poison';
+    }
+    if (!this.canEnemyDefend()) return 'attack';
+    return Math.random() < 0.7 ? 'attack' : 'defend';
+  }
+
+  _pirateCaptainAI() {
+    this._captainTurnCounter++;
+    if (this._captainTurnCounter % (this._config.cannonballCycle ?? 3) === 0) return 'cannonball';
+    if (!this.canEnemyDefend()) return 'attack';
+    return Math.random() < 0.75 ? 'attack' : 'defend';
   }
 
   _checkGnollVengeance() {
