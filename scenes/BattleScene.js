@@ -611,6 +611,15 @@ export default class BattleScene extends Phaser.Scene {
       this._animHeroAttack(targetSprite, () => {
         if (this._enemyTintActive) { targetSprite.clearTint(); this._enemyTintActive = false; }
         const result = this._state.heroAttack(targetIdx);
+        if (result.counterReflected !== undefined) {
+          this.showMessage('ARMURE DE ROC — attaque renvoyée !');
+          this.floatText(targetSprite.x, targetSprite.y - 30, 'IMMUNISÉ', '#D4C060', true);
+          this.floatText(this._hero.x, this._hero.y - 30, `-${result.counterReflected}`, '#EF4444');
+          this._updateHpBars();
+          if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+          cb();
+          return;
+        }
         const color  = result.blocked ? '#F59E0B' : '#EF4444';
         const text   = result.blocked ? `-${result.damage} BLOQUÉ` : `-${result.damage}`;
         this._explode(targetSprite.x, targetSprite.y - 20);
@@ -798,6 +807,13 @@ export default class BattleScene extends Phaser.Scene {
       case 'curse':  this._doWitchCurse();  break;
       case 'regen':  this._doWitchRegen();  break;
       case 'defend': this._doEnemyDefend(); break;
+      case 'counterAttack': this._doDwarfCounter();    break;
+      case 'explosion':     this._doMinerExplosion();  break;
+      case 'heavyBlow':     this._doTrollHeavyBlow();  break;
+      case 'quake':         this._doTrollQuake();       break;
+      case 'phase2':
+        if (this._state._config.ai === 'cave_troll_king') { this._doTrollKingPhase2(); break; }
+        this._showPhase2Transition(); break;
       default:       this._doEnemyAttack(); break;
     }
   }
@@ -940,6 +956,115 @@ export default class BattleScene extends Phaser.Scene {
       this._updateHpBars();
       window.dispatchEvent(new CustomEvent('animation-end'));
     });
+  }
+
+  _doDwarfCounter() {
+    this.showMessage('ARMURE DE ROC — contre-attaque annoncée !');
+    const sprite = this._enemy;
+    const g = this.add.graphics();
+    this.tweens.add({
+      targets: { v: 0 }, v: 1, duration: 500, yoyo: true,
+      onUpdate: (tw) => {
+        const a = tw.getValue();
+        g.clear();
+        g.fillStyle(0xC0C0C0, 0.3 * a);
+        g.fillCircle(sprite.x, sprite.y, 50 * a + 20);
+        g.lineStyle(3, 0xD4C060, 0.8 * a);
+        g.strokeCircle(sprite.x, sprite.y, 50 * a + 20);
+      },
+      onComplete: () => g.destroy(),
+    });
+    this.floatText(sprite.x, sprite.y - 40, 'ARMURE DE ROC', '#D4C060', true);
+    this.time.delayedCall(600, () => window.dispatchEvent(new CustomEvent('animation-end')));
+  }
+
+  _doMinerExplosion() {
+    this.showMessage('Le Mineur allume la mèche !');
+    const sprite = this._enemy;
+    this.time.delayedCall(400, () => {
+      const result = this._state.explosion();
+      this.cameras.main.shake(300, 0.04);
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 350, yoyo: true,
+        onUpdate: (tw) => {
+          const a = tw.getValue();
+          g.clear();
+          g.fillStyle(0xFF6600, 0.55 * a); g.fillCircle(this._hero.x, this._hero.y, 80 * a);
+          g.fillStyle(0xFF2200, 0.35 * a); g.fillCircle(this._hero.x, this._hero.y, 110 * a);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this.floatText(this._hero.x, this._hero.y - 40, `BOOM ! -${result.damage}`, '#FF6600', true);
+      this._screenFlash();
+      this._updateHpBars();
+      if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doTrollHeavyBlow() {
+    this.showMessage(`${this._enemyConfig.name} charge une frappe lourde !`);
+    this.time.delayedCall(300, () => {
+      this._animEnemyAttack(this._enemy, this._enemyBaseX, () => {
+        const results = this._state.enemyAttack();
+        const result  = results[0];
+        this.cameras.main.shake(200, 0.025);
+        this._handleEnemyHitResult(result, this._enemy);
+        if (result.trollRegen > 0) this.floatText(this._enemy.x, this._enemy.y - 50, `+${result.trollRegen} REG`, '#22C55E');
+        this.floatText(this._hero.x, this._hero.y - 55, 'FRAPPE LOURDE !', '#FF8800', true);
+        if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+        window.dispatchEvent(new CustomEvent('animation-end'));
+      });
+    });
+  }
+
+  _doTrollQuake() {
+    this.showMessage('SÉISME — le sol tremble !');
+    this.cameras.main.shake(350, 0.035);
+    this.time.delayedCall(300, () => {
+      const result = this._state.trollQuake();
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 400, yoyo: true,
+        onUpdate: (tw) => {
+          const a = tw.getValue();
+          g.clear();
+          g.fillStyle(0x884400, 0.4 * a);
+          g.fillRect(0, 260, 800, 100);
+          g.lineStyle(3, 0xAA6622, 0.6 * a);
+          g.strokeRect(0, 260, 800, 100);
+        },
+        onComplete: () => g.destroy(),
+      });
+      if (result.shieldBroken) {
+        this.showMessage('SÉISME — bouclier brisé !');
+        this._hero.clearTint();
+        this.floatText(this._hero.x, this._hero.y - 50, 'BOUCLIER BRISÉ !', '#FF4400');
+      }
+      this.floatText(this._hero.x, this._hero.y - 30, `-${result.damage}`, '#FF8800', true);
+      this._updateHpBars();
+      if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doTrollKingPhase2() {
+    this.showMessage('LE ROI TROLL EST EN RAGE !');
+    const sprite = this._enemy;
+    const g = this.add.graphics();
+    this.tweens.add({
+      targets: { v: 0 }, v: 1, duration: 600, yoyo: true,
+      onUpdate: (tw) => {
+        const a = tw.getValue();
+        g.clear();
+        g.fillStyle(0xFF2200, 0.3 * a); g.fillCircle(sprite.x, sprite.y, 70 * a);
+        g.lineStyle(3, 0xFF4400, 0.7 * a); g.strokeCircle(sprite.x, sprite.y, 70 * a);
+      },
+      onComplete: () => { g.destroy(); this._doEnemyAttack(); },
+    });
+    this.floatText(sprite.x, sprite.y - 50, 'PHASE 2 !', '#FF2200', true);
+    this.cameras.main.shake(200, 0.02);
   }
 
   _animEnemyAttack(sprite, baseX, onImpact) {
