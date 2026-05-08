@@ -1174,3 +1174,80 @@ export function createShadowLordDefendSheet() {
   for (let i = 0; i < frames; i++) drawShadowLord(ctx, i*SLD_FW, 0, { defending: true });
   return { canvas: c, frameWidth: SLD_FW, frameHeight: SLD_FH, frameCount: frames };
 }
+
+// ── CAVE BAT ─────────────────────────────────────────────────────────────────
+const BAT_FW = 48, BAT_FH = 40;
+const BATC = {
+  wing:  '#2A1A3A', wingD: '#0A0010',
+  body:  '#3A2A4A', bodyD: '#1A0A2A',
+  eye:   '#FF2222',
+  fang:  '#E8D4A0',
+  claw:  '#1A0A2A',
+};
+
+function drawBat(ctx, ox, oy, { frame = 0, attacking = false, defending = false } = {}) {
+  const flap = (!defending && !attacking) ? (frame % 2 === 0 ? 4 : 0) : 0;
+  const wSpread = defending ? 4 : attacking ? 18 : 12 + flap;
+
+  // Wings left
+  poly(ctx, [
+    [ox + 24, oy + 22],
+    [ox + 24 - wSpread - 4, oy + 10 - flap],
+    [ox + 24 - wSpread - 10, oy + 26],
+    [ox + 20, oy + 28],
+  ], BATC.wing, BATC.wingD);
+
+  // Wings right
+  poly(ctx, [
+    [ox + 24, oy + 22],
+    [ox + 24 + wSpread + 4, oy + 10 - flap],
+    [ox + 24 + wSpread + 10, oy + 26],
+    [ox + 28, oy + 28],
+  ], BATC.wing, BATC.wingD);
+
+  // Body
+  circ(ctx, ox + 24, oy + 22, 8, BATC.body, BATC.bodyD);
+
+  // Head
+  circ(ctx, ox + 24, oy + 14, 6, BATC.body, BATC.bodyD);
+
+  // Ears
+  poly(ctx, [[ox + 20, oy + 10], [ox + 17, oy + 3], [ox + 23, oy + 10]], BATC.wingD, BATC.wingD);
+  poly(ctx, [[ox + 28, oy + 10], [ox + 31, oy + 3], [ox + 25, oy + 10]], BATC.wingD, BATC.wingD);
+
+  // Eyes
+  circ(ctx, ox + 21, oy + 13, 2.5, BATC.eye);
+  circ(ctx, ox + 27, oy + 13, 2.5, BATC.eye);
+
+  // Fangs
+  fillR(ctx, ox + 22, oy + 18, 2, 4, BATC.fang);
+  fillR(ctx, ox + 26, oy + 18, 2, 4, BATC.fang);
+}
+
+export function createCaveBatIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, BAT_FW, BAT_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawBat(ctx, i * BAT_FW, 0, { frame: i });
+  return { canvas: c, frameWidth: BAT_FW, frameHeight: BAT_FH, frameCount: frames };
+}
+
+export function createCaveBatWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, BAT_FW, BAT_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawBat(ctx, i * BAT_FW, 0, { frame: i });
+  return { canvas: c, frameWidth: BAT_FW, frameHeight: BAT_FH, frameCount: frames };
+}
+
+export function createCaveBatAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, BAT_FW, BAT_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawBat(ctx, i * BAT_FW, 0, { frame: i, attacking: i >= 2 });
+  return { canvas: c, frameWidth: BAT_FW, frameHeight: BAT_FH, frameCount: frames };
+}
+
+export function createCaveBatDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, BAT_FW, BAT_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawBat(ctx, i * BAT_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: BAT_FW, frameHeight: BAT_FH, frameCount: frames };
+}
