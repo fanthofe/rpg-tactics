@@ -1481,3 +1481,176 @@ export function createCaveTrollKingDefendSheet() {
   for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { defending: true, king: true });
   return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
 }
+
+// ── PIRATES ───────────────────────────────────────────────────────────────────
+const PIR_FW = 64, PIR_FH = 84;
+const PIRC = {
+  cloth:  '#2A1E3A', clothD: '#150E1E',
+  skin:   '#C8A070', skinD:  '#A87850',
+  band:   '#CC2222', bandD:  '#881111',
+  sword:  '#8A9AAA', swordD: '#5A6A7A',
+  belt:   '#5A4020', beltD:  '#3A2810',
+  boot:   '#1E1008', bootD:  '#0A0400',
+  gold:   '#C8A820', goldD:  '#8A6810',
+  qm:     '#3A4A2A', qmD:    '#1E2810',
+  cap:    '#7A1A1A', capD:   '#4A0A0A',
+  hat:    '#1A1010', hatD:   '#0A0808',
+};
+
+function drawPirate(ctx, ox, oy, { frame = 0, walking = false, attacking = false, defending = false, quartermaster = false, captain = false } = {}) {
+  const bobY = walking ? (frame % 2 === 0 ? 1 : -1) : 0;
+  const oy2  = oy + bobY;
+  const coat = captain ? PIRC.cap : quartermaster ? PIRC.qm : PIRC.cloth;
+  const coatD = captain ? PIRC.capD : quartermaster ? PIRC.qmD : PIRC.clothD;
+  const armY  = attacking ? oy2 + 28 : oy2 + 36;
+
+  // Legs
+  box(ctx, ox + 16, oy2 + 58, 12, 22, 2, coat, coatD);
+  box(ctx, ox + 36, oy2 + 58, 12, 22, 2, coat, coatD);
+  // Boots
+  box(ctx, ox + 14, oy2 + 72, 14, 8, 2, PIRC.boot, PIRC.bootD);
+  box(ctx, ox + 36, oy2 + 72, 14, 8, 2, PIRC.boot, PIRC.bootD);
+
+  // Body
+  box(ctx, ox + 13, oy2 + 32, 38, 28, 3, coat, coatD);
+
+  // Belt
+  box(ctx, ox + 11, oy2 + 55, 42, 6, 1, PIRC.belt, PIRC.beltD);
+  box(ctx, ox + 28, oy2 + 54, 8, 8, 1, PIRC.gold, PIRC.goldD);
+
+  // Captain epaulettes
+  if (captain) {
+    box(ctx, ox + 8,  oy2 + 32, 10, 7, 2, PIRC.gold, PIRC.goldD);
+    box(ctx, ox + 46, oy2 + 32, 10, 7, 2, PIRC.gold, PIRC.goldD);
+  }
+
+  // Left arm
+  box(ctx, ox + 4, oy2 + 36, 12, 20, 2, PIRC.skin, PIRC.skinD);
+
+  // Right arm (sword arm)
+  box(ctx, ox + 48, armY, 12, 20, 2, PIRC.skin, PIRC.skinD);
+
+  // Head
+  box(ctx, ox + 18, oy2 + 10, 28, 24, 4, PIRC.skin, PIRC.skinD);
+
+  if (captain) {
+    // Large tricorne hat
+    box(ctx, ox + 9,  oy2 + 2, 46, 12, 3, PIRC.hat, PIRC.hatD);
+    box(ctx, ox + 5,  oy2 + 8, 54, 6,  1, PIRC.hat, PIRC.hatD);
+    // Feather
+    poly(ctx, [[ox+52,oy2+2],[ox+60,oy2-6],[ox+55,oy2+4],[ox+49,oy2+4]], '#CC4422', '#882211');
+    // Gold hat band
+    box(ctx, ox + 9, oy2 + 10, 46, 3, 0, PIRC.gold, PIRC.goldD);
+  } else if (quartermaster) {
+    // Bicorne hat
+    box(ctx, ox + 12, oy2 + 2, 40, 10, 2, PIRC.hat, PIRC.hatD);
+    box(ctx, ox + 8,  oy2 + 7, 48, 6,  1, PIRC.hat, PIRC.hatD);
+  } else {
+    // Bandana
+    box(ctx, ox + 16, oy2 + 10, 32, 10, 3, PIRC.band, PIRC.bandD);
+    box(ctx, ox + 44, oy2 + 8,  8,  6,  2, PIRC.band, PIRC.bandD);
+  }
+
+  // Eyes
+  circ(ctx, ox + 25, oy2 + 22, 3, '#180A00');
+  circ(ctx, ox + 39, oy2 + 22, 3, '#180A00');
+
+  // Stubble
+  box(ctx, ox + 20, oy2 + 28, 24, 4, 1, '#7A5A3A', '#5A3A1A', 1);
+
+  // Weapon
+  if (quartermaster) {
+    // Poisoned dagger (green tip)
+    const dx = attacking ? ox + 52 : ox + 54;
+    box(ctx, dx, armY + 4, 3, 18, 1, PIRC.swordD, PIRC.swordD);
+    box(ctx, dx - 4, armY + 2, 11, 4,  1, PIRC.sword, PIRC.swordD);
+    box(ctx, dx, armY + 18, 3, 6,  1, '#44AA22', '#226611');
+  } else if (captain) {
+    // Long sword
+    const sx = attacking ? ox + 50 : ox + 52;
+    box(ctx, sx, armY + 2, 4, 28, 1, PIRC.swordD, PIRC.swordD);
+    box(ctx, sx - 5, armY, 14, 4, 1, PIRC.sword,  PIRC.swordD);
+  } else {
+    // Curved cutlass
+    const sx = attacking ? ox + 50 : ox + 52;
+    box(ctx, sx, armY + 2, 4, 22, 1, PIRC.sword,  PIRC.swordD);
+    box(ctx, sx - 4, armY, 12, 4, 1, PIRC.sword,  PIRC.swordD);
+    // Curve tip
+    box(ctx, sx - 2, armY + 22, 4, 4, 1, PIRC.sword, PIRC.swordD);
+  }
+}
+
+export function createPirateGruntIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateGruntWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i, walking: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateGruntAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i, attacking: i >= 2 });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateGruntDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+
+export function createPirateQuartermasterIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i, quartermaster: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateQuartermasterWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i, walking: true, quartermaster: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateQuartermasterAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i, attacking: i >= 2, quartermaster: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateQuartermasterDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { defending: true, quartermaster: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+
+export function createPirateCaptainIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i, captain: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateCaptainWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i, walking: true, captain: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateCaptainAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { frame: i, attacking: i >= 2, captain: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
+export function createPirateCaptainDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, PIR_FW, PIR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { defending: true, captain: true });
+  return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
+}
