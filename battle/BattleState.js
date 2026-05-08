@@ -48,11 +48,27 @@ export default class BattleState {
     this.phase2Active        = false;
     this.phase2JustTriggered = false;
     this._healBlockCounter   = 0;
+
+    // Cave Dwarf
+    this.dwarfCounterActive = false;
+    this._dwarfTurnCounter  = 0;
+
+    // Cave Miner
+    this._minerCountdown    = 0;
+
+    // Cave Troll / King
+    this._trollTurnCounter  = 0;
   }
 
   // ── Hero actions ──────────────────────────────────────────────────────────
 
   heroAttack(targetIndex = 0) {
+    if (this.dwarfCounterActive) {
+      this.dwarfCounterActive = false;
+      const reflected = Math.floor(this._heroAtk * (this._config.counterReflect ?? 0.5));
+      this.heroHp = Math.max(0, this.heroHp - reflected);
+      return { damage: 0, rawDamage: 0, blocked: false, crit: false, targetIndex, counterReflected: reflected };
+    }
     const raw    = this._heroAtk + Math.floor(Math.random() * 8);
     const crit   = Math.random() < this._heroLck * 0.02;
     const blocked = this._enemyDefending;
@@ -113,6 +129,11 @@ export default class BattleState {
       case 'witch':      return this._witchAI();
       case 'gnolls':     return 'attack';
       case 'shadowLord': return this._shadowLordAI();
+      case 'cave_bat':        return 'attack';
+      case 'cave_dwarf':      return this._caveDwarfAI();
+      case 'cave_miner':      return this._caveMinerAI();
+      case 'cave_troll':      return this._caveTrollAI();
+      case 'cave_troll_king': return this._caveTrollKingAI();
       default:           return this._goblinAI();
     }
   }
@@ -122,6 +143,11 @@ export default class BattleState {
       case 'witch':      return [this._witchDoAttack()];
       case 'gnolls':     return this._gnollsDoAttack();
       case 'shadowLord': return this._shadowLordDoAttack();
+      case 'cave_bat':        return this._gnollsDoAttack();
+      case 'cave_dwarf':      return [this._basicEnemyAttack()];
+      case 'cave_miner':      return [this._basicEnemyAttack()];
+      case 'cave_troll':      return [this._trollDoAttack()];
+      case 'cave_troll_king': return [this._trollDoAttack()];
       default:           return [this._basicEnemyAttack()];
     }
   }
@@ -227,6 +253,34 @@ export default class BattleState {
       });
   }
 
+  _trollDoAttack() {
+    const cfg     = this._config;
+    const mult    = this.phase2Active ? (cfg.phase2AtkMult ?? 1.5) : 1;
+    const range   = cfg.atkMax - cfg.atkMin;
+    const raw     = cfg.atkMin + Math.floor(Math.random() * (range + 1));
+    const result  = this._applyDamageToHero(Math.floor(raw * mult));
+    const regen   = cfg.regenPerTurn ?? 0;
+    const healed  = Math.min(regen, this.enemyMaxHp - this.enemyHp);
+    this.enemyHp += healed;
+    result.trollRegen = healed;
+    return result;
+  }
+
+  explosion() {
+    const dmg  = this._config.explosionDamage ?? 60;
+    this.heroHp = Math.max(0, this.heroHp - dmg);
+    return { damage: dmg };
+  }
+
+  trollQuake() {
+    const dmg         = this._config.quakeDamage ?? 40;
+    const shieldBroken = this.heroShieldActive;
+    this.heroShieldActive = false;
+    this.heroShieldTurns  = 0;
+    this.heroHp = Math.max(0, this.heroHp - dmg);
+    return { damage: dmg, shieldBroken };
+  }
+
   _shadowLordDoAttack() {
     const cfg   = this._config;
     const range = cfg.atkMax - cfg.atkMin;
@@ -282,6 +336,41 @@ export default class BattleState {
       this.phase2JustTriggered = true;
       return 'phase2';
     }
+    return 'attack';
+  }
+
+  _caveDwarfAI() {
+    this._dwarfTurnCounter++;
+    if (this._dwarfTurnCounter % (this._config.counterCycle ?? 3) === 0) {
+      this.dwarfCounterActive = true;
+      return 'counterAttack';
+    }
+    return 'attack';
+  }
+
+  _caveMinerAI() {
+    this._minerCountdown++;
+    if (this._minerCountdown >= (this._config.explosionCountdown ?? 3)) {
+      this._minerCountdown = 0;
+      return 'explosion';
+    }
+    return 'attack';
+  }
+
+  _caveTrollAI() {
+    this._trollTurnCounter++;
+    if (this._trollTurnCounter % (this._config.heavyBlowCycle ?? 3) === 0) return 'heavyBlow';
+    return 'attack';
+  }
+
+  _caveTrollKingAI() {
+    if (!this.phase2Active && this.enemyHp <= (this._config.phase2Threshold ?? 155)) {
+      this.phase2Active        = true;
+      this.phase2JustTriggered = true;
+      return 'phase2';
+    }
+    this._trollTurnCounter++;
+    if (this._trollTurnCounter % (this._config.quakeCycle ?? 3) === 0) return 'quake';
     return 'attack';
   }
 
