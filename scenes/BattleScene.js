@@ -8,6 +8,22 @@ import {
   createGnollIdleSheet, createGnollWalkSheet, createGnollAttackSheet, createGnollDefendSheet,
   createShadowLordIdleSheet, createShadowLordWalkSheet,
   createShadowLordAttackSheet, createShadowLordDefendSheet,
+  createCaveBatIdleSheet, createCaveBatWalkSheet,
+  createCaveBatAttackSheet, createCaveBatDefendSheet,
+  createCaveDwarfIdleSheet, createCaveDwarfWalkSheet,
+  createCaveDwarfAttackSheet, createCaveDwarfDefendSheet,
+  createCaveMinerIdleSheet, createCaveMinerWalkSheet,
+  createCaveMinerAttackSheet, createCaveMinerDefendSheet,
+  createCaveTrollIdleSheet, createCaveTrollWalkSheet,
+  createCaveTrollAttackSheet, createCaveTrollDefendSheet,
+  createCaveTrollKingIdleSheet, createCaveTrollKingWalkSheet,
+  createCaveTrollKingAttackSheet, createCaveTrollKingDefendSheet,
+  createPirateGruntIdleSheet, createPirateGruntWalkSheet,
+  createPirateGruntAttackSheet, createPirateGruntDefendSheet,
+  createPirateQuartermasterIdleSheet, createPirateQuartermasterWalkSheet,
+  createPirateQuartermasterAttackSheet, createPirateQuartermasterDefendSheet,
+  createPirateCaptainIdleSheet, createPirateCaptainWalkSheet,
+  createPirateCaptainAttackSheet, createPirateCaptainDefendSheet,
 } from '../assets/sprites.js';
 import BattleState from '../battle/BattleState.js';
 import { ENEMIES } from '../battle/enemies.js';
@@ -15,11 +31,19 @@ import { VILLAGES } from '../battle/villages.js';
 import { rollLoot } from '../battle/items.js';
 
 const SPRITE_DEFS = {
-  goblin:     { prefix: 'goblin',      sheets: { idle: createGoblinIdleSheet,      walk: createGoblinWalkSheet,      attack: createGoblinAttackSheet,      defend: createGoblinDefendSheet      } },
-  orc:        { prefix: 'orc',         sheets: { idle: createOrcIdleSheet,          walk: createOrcWalkSheet,          attack: createOrcAttackSheet,          defend: createOrcDefendSheet          } },
-  witch:      { prefix: 'witch',       sheets: { idle: createWitchIdleSheet,        walk: createWitchWalkSheet,        attack: createWitchAttackSheet,        defend: createWitchDefendSheet        } },
-  gnoll:      { prefix: 'gnoll',       sheets: { idle: createGnollIdleSheet,        walk: createGnollWalkSheet,        attack: createGnollAttackSheet,        defend: createGnollDefendSheet        } },
-  shadowLord: { prefix: 'shadow-lord', sheets: { idle: createShadowLordIdleSheet,   walk: createShadowLordWalkSheet,   attack: createShadowLordAttackSheet,   defend: createShadowLordDefendSheet   } },
+  goblin:               { prefix: 'goblin',                sheets: { idle: createGoblinIdleSheet,               walk: createGoblinWalkSheet,               attack: createGoblinAttackSheet,               defend: createGoblinDefendSheet               } },
+  orc:                  { prefix: 'orc',                   sheets: { idle: createOrcIdleSheet,                  walk: createOrcWalkSheet,                  attack: createOrcAttackSheet,                  defend: createOrcDefendSheet                  } },
+  witch:                { prefix: 'witch',                 sheets: { idle: createWitchIdleSheet,                walk: createWitchWalkSheet,                attack: createWitchAttackSheet,                defend: createWitchDefendSheet                } },
+  gnoll:                { prefix: 'gnoll',                 sheets: { idle: createGnollIdleSheet,                walk: createGnollWalkSheet,                attack: createGnollAttackSheet,                defend: createGnollDefendSheet                } },
+  shadowLord:           { prefix: 'shadow-lord',           sheets: { idle: createShadowLordIdleSheet,           walk: createShadowLordWalkSheet,           attack: createShadowLordAttackSheet,           defend: createShadowLordDefendSheet           } },
+  cave_bat:             { prefix: 'cave-bat',              sheets: { idle: createCaveBatIdleSheet,              walk: createCaveBatWalkSheet,              attack: createCaveBatAttackSheet,              defend: createCaveBatDefendSheet              } },
+  cave_dwarf:           { prefix: 'cave-dwarf',            sheets: { idle: createCaveDwarfIdleSheet,            walk: createCaveDwarfWalkSheet,            attack: createCaveDwarfAttackSheet,            defend: createCaveDwarfDefendSheet            } },
+  cave_miner:           { prefix: 'cave-miner',            sheets: { idle: createCaveMinerIdleSheet,            walk: createCaveMinerWalkSheet,            attack: createCaveMinerAttackSheet,            defend: createCaveMinerDefendSheet            } },
+  cave_troll:           { prefix: 'cave-troll',            sheets: { idle: createCaveTrollIdleSheet,            walk: createCaveTrollWalkSheet,            attack: createCaveTrollAttackSheet,            defend: createCaveTrollDefendSheet            } },
+  cave_troll_king:      { prefix: 'cave-troll-king',       sheets: { idle: createCaveTrollKingIdleSheet,        walk: createCaveTrollKingWalkSheet,        attack: createCaveTrollKingAttackSheet,        defend: createCaveTrollKingDefendSheet        } },
+  pirate_grunt:         { prefix: 'pirate-grunt',          sheets: { idle: createPirateGruntIdleSheet,          walk: createPirateGruntWalkSheet,          attack: createPirateGruntAttackSheet,          defend: createPirateGruntDefendSheet          } },
+  pirate_quartermaster: { prefix: 'pirate-quartermaster',  sheets: { idle: createPirateQuartermasterIdleSheet,  walk: createPirateQuartermasterWalkSheet,  attack: createPirateQuartermasterAttackSheet,  defend: createPirateQuartermasterDefendSheet  } },
+  pirate_captain:       { prefix: 'pirate-captain',        sheets: { idle: createPirateCaptainIdleSheet,        walk: createPirateCaptainWalkSheet,        attack: createPirateCaptainAttackSheet,        defend: createPirateCaptainDefendSheet        } },
 };
 
 export default class BattleScene extends Phaser.Scene {
