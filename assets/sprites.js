@@ -1364,3 +1364,120 @@ export function createCaveMinerDefendSheet() {
   for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { defending: true, miner: true });
   return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
 }
+
+// ── CAVE TROLL / TROLL KING ───────────────────────────────────────────────────
+const TRL_FW = 80, TRL_FH = 96;
+const TRLC = {
+  skin:  '#5A7A4A', skinD: '#3A5A2A',
+  cloth: '#4A3A2A', clothD:'#2A1A0A',
+  nail:  '#8A8A3A', nailD: '#5A5A1A',
+  eye:   '#FF8800',
+  rock:  '#6A6A6A', rockD: '#4A4A4A',
+  crown: '#8A7A5A', crownD:'#5A5040',
+};
+
+function drawTroll(ctx, ox, oy, { frame = 0, walking = false, attacking = false, defending = false, king = false } = {}) {
+  const bobY  = walking ? (frame % 2 === 0 ? 2 : -2) : 0;
+  const oy2   = oy + bobY + (king ? -8 : 0);
+  const armY  = attacking ? oy2 + 16 : oy2 + 30;
+
+  // Legs
+  box(ctx, ox + 12, oy2 + 68, 18, 24, 3, TRLC.skin, TRLC.skinD);
+  box(ctx, ox + 50, oy2 + 68, 18, 24, 3, TRLC.skin, TRLC.skinD);
+
+  // Cloth
+  box(ctx, ox + 10, oy2 + 52, 60, 20, 2, TRLC.cloth, TRLC.clothD);
+
+  // Massive torso
+  box(ctx, ox + 6, oy2 + 26, 68, 38, 6, TRLC.skin, TRLC.skinD);
+
+  // Arms
+  box(ctx, ox + 0, armY, 16, 38, 4, TRLC.skin, TRLC.skinD);
+  box(ctx, ox + 64, armY, 16, 38, 4, TRLC.skin, TRLC.skinD);
+
+  // Fists
+  circ(ctx, ox + 8,  armY + 36, 10, TRLC.skin, TRLC.skinD);
+  circ(ctx, ox + 72, armY + 36, 10, TRLC.skin, TRLC.skinD);
+
+  // Claws
+  for (let i = 0; i < 3; i++) {
+    fillR(ctx, ox + 2 + i * 5, armY + 43, 3, 6, TRLC.nail);
+    fillR(ctx, ox + 65 + i * 5, armY + 43, 3, 6, TRLC.nail);
+  }
+
+  // Head
+  box(ctx, ox + 14, oy2 + 4, 52, 30, 6, TRLC.skin, TRLC.skinD);
+
+  // Heavy brow
+  box(ctx, ox + 12, oy2 + 4, 56, 12, 3, TRLC.skinD, TRLC.skinD);
+
+  // Eyes
+  circ(ctx, ox + 26, oy2 + 18, 5, '#FFA500');
+  circ(ctx, ox + 26, oy2 + 18, 3, TRLC.eye);
+  circ(ctx, ox + 54, oy2 + 18, 5, '#FFA500');
+  circ(ctx, ox + 54, oy2 + 18, 3, TRLC.eye);
+
+  // Tusks
+  poly(ctx, [[ox+26,oy2+30],[ox+22,oy2+38],[ox+28,oy2+30]], '#E8D4A0', TRLC.skinD);
+  poly(ctx, [[ox+54,oy2+30],[ox+58,oy2+38],[ox+52,oy2+30]], '#E8D4A0', TRLC.skinD);
+
+  // King crown (rocky)
+  if (king) {
+    box(ctx, ox + 12, oy2 + 2, 56, 6, 0, TRLC.rock, TRLC.rockD);
+    for (let i = 0; i < 4; i++) {
+      box(ctx, ox + 14 + i * 14, oy2 - 6, 10, 10, 1, TRLC.rock, TRLC.rockD);
+    }
+    // Gem in center of crown
+    circ(ctx, ox + 40, oy2 - 1, 4, '#FF4444', '#AA0000');
+  }
+}
+
+export function createCaveTrollIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, TRL_FW, TRL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { frame: i });
+  return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
+}
+export function createCaveTrollWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, TRL_FW, TRL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { frame: i, walking: true });
+  return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
+}
+export function createCaveTrollAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, TRL_FW, TRL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { frame: i, attacking: i >= 2 });
+  return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
+}
+export function createCaveTrollDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, TRL_FW, TRL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
+}
+
+export function createCaveTrollKingIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, TRL_FW, TRL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { frame: i, king: true });
+  return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
+}
+export function createCaveTrollKingWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, TRL_FW, TRL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { frame: i, walking: true, king: true });
+  return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
+}
+export function createCaveTrollKingAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, TRL_FW, TRL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { frame: i, attacking: i >= 2, king: true });
+  return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
+}
+export function createCaveTrollKingDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, TRL_FW, TRL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawTroll(ctx, i * TRL_FW, 0, { defending: true, king: true });
+  return { canvas: c, frameWidth: TRL_FW, frameHeight: TRL_FH, frameCount: frames };
+}
