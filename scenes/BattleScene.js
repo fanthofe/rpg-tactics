@@ -595,6 +595,11 @@ export default class BattleScene extends Phaser.Scene {
           return;
         }
         this._state.tickHeroTurn();
+        if (this._state.heroPoisoned && this._state.heroPoisonDamage > 0) {
+          this.floatText(this._hero.x, this._hero.y - 30, `-${this._state.heroPoisonDamage} ☠`, '#44CC44');
+          this._updateHpBars();
+          if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+        }
         this.time.delayedCall(450, () => this._executeEnemyTurn());
       });
     });
@@ -814,6 +819,8 @@ export default class BattleScene extends Phaser.Scene {
       case 'phase2':
         if (this._state._config.ai === 'cave_troll_king') { this._doTrollKingPhase2(); break; }
         this._showPhase2Transition(); break;
+      case 'poison':     this._doPiratePoison();     break;
+      case 'cannonball': this._doPirateCannonball();  break;
       default:       this._doEnemyAttack(); break;
     }
   }
@@ -829,6 +836,12 @@ export default class BattleScene extends Phaser.Scene {
         this._animEnemyAttack(this._enemy, this._enemyBaseX, () => {
           const results = this._state.enemyAttack();
           this._handleEnemyHitResult(results[0], this._enemy);
+              if (results[0].trollRegen > 0) {
+                this.floatText(this._enemy.x, this._enemy.y - 50, `+${results[0].trollRegen} REG`, '#22C55E');
+              }
+              if (results[0].pillaged) {
+                this.floatText(this._enemy.x, this._enemy.y - 50, `PILLAGE ×${this._state.pillageStacks}`, '#FF9900');
+              }
           // Shadow Lord double hit
           if (results.length > 1) {
             this.time.delayedCall(250, () => {
@@ -1065,6 +1078,54 @@ export default class BattleScene extends Phaser.Scene {
     });
     this.floatText(sprite.x, sprite.y - 50, 'PHASE 2 !', '#FF2200', true);
     this.cameras.main.shake(200, 0.02);
+  }
+
+  _doPiratePoison() {
+    this.showMessage('Le Quartier-Maître empoisonne votre lame !');
+    this.time.delayedCall(300, () => {
+      this._animEnemyAttack(this._enemy, this._enemyBaseX, () => {
+        const g = this.add.graphics();
+        this.tweens.add({
+          targets: { v: 0 }, v: 1, duration: 500, yoyo: true,
+          onUpdate: (tw) => {
+            const a = tw.getValue();
+            g.clear();
+            g.fillStyle(0x22AA22, 0.3 * a); g.fillCircle(this._hero.x, this._hero.y, 55 * a + 15);
+            g.lineStyle(2, 0x44CC44, 0.6 * a); g.strokeCircle(this._hero.x, this._hero.y, 55 * a + 15);
+          },
+          onComplete: () => g.destroy(),
+        });
+        this._hero.setTint(0x44CC44);
+        this.time.delayedCall(800, () => this._hero.clearTint());
+        this.floatText(this._hero.x, this._hero.y - 35, 'EMPOISONNÉ !', '#44CC44', true);
+        this.showMessage(`Poison actif — ${this._state.heroPoisonDamage} dégâts par tour.`);
+        window.dispatchEvent(new CustomEvent('animation-end'));
+      });
+    });
+  }
+
+  _doPirateCannonball() {
+    this.showMessage('BOULET DE CANON !');
+    this.time.delayedCall(400, () => {
+      const result = this._state.cannonball();
+      this.cameras.main.shake(250, 0.03);
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 300, yoyo: true,
+        onUpdate: (tw) => {
+          const a = tw.getValue();
+          g.clear();
+          g.fillStyle(0xFF2222, 0.45 * a); g.fillCircle(this._hero.x, this._hero.y, 70 * a);
+          g.lineStyle(4, 0xFF6666, 0.7 * a); g.strokeCircle(this._hero.x, this._hero.y, 70 * a);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this._screenFlash();
+      this.floatText(this._hero.x, this._hero.y - 40, `BOULET ! -${result.damage}`, '#FF4444', true);
+      this._updateHpBars();
+      if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
   }
 
   _animEnemyAttack(sprite, baseX, onImpact) {
