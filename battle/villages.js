@@ -19,14 +19,14 @@ export const VILLAGES = {
     id: 'mine', name: 'Mine', icon: '⛏',
     pos: { x: 175, y: 60 }, diff: 2,
     parent: 'foret',
-    battles: ['cave_dwarf', 'cave_troll'],
+    battles: ['cave_bat', 'cave_dwarf', 'cave_miner', 'cave_troll', 'cave_troll_king'],
     connections: ['foret'],
   },
   plage: {
     id: 'plage', name: 'Plage pirate', icon: '⚓',
     pos: { x: 280, y: 160 }, diff: 3,
     parent: 'foret',
-    battles: ['pirate_grunt', 'pirate_captain'],
+    battles: ['pirate_grunt', 'pirate_crew', 'pirate_quartermaster', 'pirate_captain'],
     connections: ['foret', 'temple'],
   },
   temple: {
