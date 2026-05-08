@@ -1251,3 +1251,116 @@ export function createCaveBatDefendSheet() {
   for (let i = 0; i < frames; i++) drawBat(ctx, i * BAT_FW, 0, { defending: true });
   return { canvas: c, frameWidth: BAT_FW, frameHeight: BAT_FH, frameCount: frames };
 }
+
+// ── CAVE DWARF / MINER ────────────────────────────────────────────────────────
+const DWF_FW = 64, DWF_FH = 80;
+const DWFC = {
+  armor:  '#5A6A7A', armorD: '#3A4A5A',
+  skin:   '#C87840', skinD:  '#A85820',
+  beard:  '#8A5A2A', beardD: '#5A3A10',
+  helm:   '#4A5A6A', helmD:  '#2A3A4A',
+  pick:   '#909090', pickD:  '#5A5A5A',
+  pickH:  '#6A4A2A',
+  tnt:    '#CC2222', tntD:   '#881111',
+  fuse:   '#FF8800',
+};
+
+function drawDwarf(ctx, ox, oy, { frame = 0, walking = false, attacking = false, defending = false, miner = false } = {}) {
+  const bobY = walking ? (frame % 2 === 0 ? 1 : -1) : 0;
+  const oy2  = oy + bobY;
+
+  // Legs (very short)
+  box(ctx, ox + 17, oy2 + 58, 12, 18, 2, DWFC.armor, DWFC.armorD);
+  box(ctx, ox + 35, oy2 + 58, 12, 18, 2, DWFC.armor, DWFC.armorD);
+
+  // Wide torso
+  box(ctx, ox + 10, oy2 + 28, 44, 32, 3, DWFC.armor, DWFC.armorD);
+
+  // Left arm
+  box(ctx, ox + 2, oy2 + 30, 12, 24, 2, DWFC.armor, DWFC.armorD);
+
+  // Right arm (raised on attack)
+  const armY = attacking ? oy2 + 18 : oy2 + 30;
+  box(ctx, ox + 50, armY, 12, 24, 2, DWFC.armor, DWFC.armorD);
+
+  // Head
+  box(ctx, ox + 16, oy2 + 8, 32, 24, 4, DWFC.skin, DWFC.skinD);
+
+  // Helmet
+  box(ctx, ox + 13, oy2 + 4, 38, 14, 3, DWFC.helm, DWFC.helmD);
+  // Helmet horns
+  box(ctx, ox + 6, oy2 + 6, 9, 6, 1, DWFC.helm, DWFC.helmD);
+  box(ctx, ox + 49, oy2 + 6, 9, 6, 1, DWFC.helm, DWFC.helmD);
+
+  // Eyes
+  circ(ctx, ox + 24, oy2 + 20, 3, '#FF5500');
+  circ(ctx, ox + 40, oy2 + 20, 3, '#FF5500');
+
+  // Beard
+  box(ctx, ox + 16, oy2 + 26, 32, 8, 3, DWFC.beard, DWFC.beardD);
+
+  if (miner) {
+    // TNT strapped to belt
+    box(ctx, ox + 22, oy2 + 48, 9, 12, 2, DWFC.tnt, DWFC.tntD);
+    fillR(ctx, ox + 25, oy2 + 44, 3, 6, DWFC.fuse);
+    // Text 'TNT' implied by red block
+    // Short pickaxe handle
+    box(ctx, ox + 50, armY + 4, 4, 20, 1, DWFC.pickH, '#4A3010');
+    box(ctx, ox + 44, armY + 2, 16, 5, 2, DWFC.pick, DWFC.pickD);
+  } else {
+    // Pickaxe
+    const px = defending ? ox + 48 : ox + 50;
+    box(ctx, px, armY + 2, 4, 22, 1, DWFC.pickH, '#4A3010');
+    box(ctx, px - 6, armY, 18, 6, 2, DWFC.pick, DWFC.pickD);
+  }
+}
+
+export function createCaveDwarfIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, DWF_FW, DWF_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { frame: i });
+  return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
+}
+export function createCaveDwarfWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, DWF_FW, DWF_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { frame: i, walking: true });
+  return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
+}
+export function createCaveDwarfAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, DWF_FW, DWF_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { frame: i, attacking: i >= 2 });
+  return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
+}
+export function createCaveDwarfDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, DWF_FW, DWF_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
+}
+
+export function createCaveMinerIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, DWF_FW, DWF_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { frame: i, miner: true });
+  return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
+}
+export function createCaveMinerWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, DWF_FW, DWF_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { frame: i, walking: true, miner: true });
+  return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
+}
+export function createCaveMinerAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, DWF_FW, DWF_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { frame: i, attacking: i >= 2, miner: true });
+  return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
+}
+export function createCaveMinerDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, DWF_FW, DWF_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDwarf(ctx, i * DWF_FW, 0, { defending: true, miner: true });
+  return { canvas: c, frameWidth: DWF_FW, frameHeight: DWF_FH, frameCount: frames };
+}
