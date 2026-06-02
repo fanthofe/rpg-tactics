@@ -24,6 +24,26 @@ import {
   createPirateQuartermasterAttackSheet, createPirateQuartermasterDefendSheet,
   createPirateCaptainIdleSheet, createPirateCaptainWalkSheet,
   createPirateCaptainAttackSheet, createPirateCaptainDefendSheet,
+  createFrostTrollIdleSheet, createFrostTrollWalkSheet,
+  createFrostTrollAttackSheet, createFrostTrollDefendSheet,
+  createIceWitchIdleSheet, createIceWitchWalkSheet,
+  createIceWitchAttackSheet, createIceWitchDefendSheet,
+  createGhostKnightIdleSheet, createGhostKnightWalkSheet,
+  createGhostKnightAttackSheet, createGhostKnightDefendSheet,
+  createVampireIdleSheet, createVampireWalkSheet,
+  createVampireAttackSheet, createVampireDefendSheet,
+  createDemonWarriorIdleSheet, createDemonWarriorWalkSheet,
+  createDemonWarriorAttackSheet, createDemonWarriorDefendSheet,
+  createDemonLordIdleSheet, createDemonLordWalkSheet,
+  createDemonLordAttackSheet, createDemonLordDefendSheet,
+  createCursedKnightIdleSheet, createCursedKnightWalkSheet,
+  createCursedKnightAttackSheet, createCursedKnightDefendSheet,
+  createJungleBeastIdleSheet, createJungleBeastWalkSheet,
+  createJungleBeastAttackSheet, createJungleBeastDefendSheet,
+  createSkeletonIdleSheet, createSkeletonWalkSheet,
+  createSkeletonAttackSheet, createSkeletonDefendSheet,
+  createLichIdleSheet, createLichWalkSheet,
+  createLichAttackSheet, createLichDefendSheet,
 } from '../assets/sprites.js';
 import BattleState from '../battle/BattleState.js';
 import { ENEMIES } from '../battle/enemies.js';
@@ -44,6 +64,16 @@ const SPRITE_DEFS = {
   pirate_grunt:         { prefix: 'pirate-grunt',          sheets: { idle: createPirateGruntIdleSheet,          walk: createPirateGruntWalkSheet,          attack: createPirateGruntAttackSheet,          defend: createPirateGruntDefendSheet          } },
   pirate_quartermaster: { prefix: 'pirate-quartermaster',  sheets: { idle: createPirateQuartermasterIdleSheet,  walk: createPirateQuartermasterWalkSheet,  attack: createPirateQuartermasterAttackSheet,  defend: createPirateQuartermasterDefendSheet  } },
   pirate_captain:       { prefix: 'pirate-captain',        sheets: { idle: createPirateCaptainIdleSheet,        walk: createPirateCaptainWalkSheet,        attack: createPirateCaptainAttackSheet,        defend: createPirateCaptainDefendSheet        } },
+  frost_troll:          { prefix: 'frost-troll',           sheets: { idle: createFrostTrollIdleSheet,           walk: createFrostTrollWalkSheet,           attack: createFrostTrollAttackSheet,           defend: createFrostTrollDefendSheet           } },
+  ice_witch:            { prefix: 'ice-witch',             sheets: { idle: createIceWitchIdleSheet,             walk: createIceWitchWalkSheet,             attack: createIceWitchAttackSheet,             defend: createIceWitchDefendSheet             } },
+  ghost_knight:         { prefix: 'ghost-knight',          sheets: { idle: createGhostKnightIdleSheet,          walk: createGhostKnightWalkSheet,          attack: createGhostKnightAttackSheet,          defend: createGhostKnightDefendSheet          } },
+  vampire:              { prefix: 'vampire',                sheets: { idle: createVampireIdleSheet,               walk: createVampireWalkSheet,               attack: createVampireAttackSheet,               defend: createVampireDefendSheet               } },
+  demon_warrior:        { prefix: 'demon-warrior',         sheets: { idle: createDemonWarriorIdleSheet,         walk: createDemonWarriorWalkSheet,         attack: createDemonWarriorAttackSheet,         defend: createDemonWarriorDefendSheet         } },
+  demon_lord:           { prefix: 'demon-lord',            sheets: { idle: createDemonLordIdleSheet,            walk: createDemonLordWalkSheet,            attack: createDemonLordAttackSheet,            defend: createDemonLordDefendSheet            } },
+  cursed_knight:        { prefix: 'cursed-knight',         sheets: { idle: createCursedKnightIdleSheet,         walk: createCursedKnightWalkSheet,         attack: createCursedKnightAttackSheet,         defend: createCursedKnightDefendSheet         } },
+  jungle_beast:         { prefix: 'jungle-beast',          sheets: { idle: createJungleBeastIdleSheet,          walk: createJungleBeastWalkSheet,          attack: createJungleBeastAttackSheet,          defend: createJungleBeastDefendSheet          } },
+  skeleton:             { prefix: 'skeleton',               sheets: { idle: createSkeletonIdleSheet,              walk: createSkeletonWalkSheet,              attack: createSkeletonAttackSheet,              defend: createSkeletonDefendSheet              } },
+  lich:                 { prefix: 'lich',                   sheets: { idle: createLichIdleSheet,                  walk: createLichWalkSheet,                  attack: createLichAttackSheet,                  defend: createLichDefendSheet                  } },
 };
 
 export default class BattleScene extends Phaser.Scene {
@@ -112,7 +142,8 @@ export default class BattleScene extends Phaser.Scene {
     this._enemyConfig = ENEMIES[enemyId] ?? ENEMIES.goblin;
     this._enemyPrefix = SPRITE_DEFS[this._enemyConfig.sprite]?.prefix ?? 'goblin';
 
-    this._state           = new BattleState(ps, this._enemyConfig);
+    const initHeroHp      = this.scene.settings.data?.heroHp ?? null;
+    this._state           = new BattleState(ps, this._enemyConfig, initHeroHp);
     this._enemyTintActive = false;
     this._enemies         = [];
     this._enemy           = null;
@@ -594,9 +625,17 @@ export default class BattleScene extends Phaser.Scene {
           this._onEnemyDefeated();
           return;
         }
+        const burnDmgThisTick = (this._state.heroBurning && this._state.heroBurnDamage > 0) ? this._state.heroBurnDamage : 0;
         this._state.tickHeroTurn();
         if (this._state.heroPoisoned && this._state.heroPoisonDamage > 0) {
           this.floatText(this._hero.x, this._hero.y - 30, `-${this._state.heroPoisonDamage} ☠`, '#44CC44');
+          this._updateHpBars();
+          if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+        }
+        if (burnDmgThisTick > 0) {
+          this.floatText(this._hero.x, this._hero.y - 48, `-${burnDmgThisTick} 🔥`, '#FF6600');
+          if (this._state.heroBurning) this._hero.setTint(0xFF4400);
+          else this._hero.clearTint();
           this._updateHpBars();
           if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
         }
@@ -622,6 +661,13 @@ export default class BattleScene extends Phaser.Scene {
           this.floatText(this._hero.x, this._hero.y - 30, `-${result.counterReflected}`, '#EF4444');
           this._updateHpBars();
           if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+          cb();
+          return;
+        }
+        if (result.phaseEvaded) {
+          this.showMessage('Le Chevalier Fantôme se dématérialise !');
+          targetSprite.clearTint();
+          this.floatText(targetSprite.x, targetSprite.y - 30, 'PHASÉ !', '#AABBFF', true);
           cb();
           return;
         }
@@ -802,6 +848,33 @@ export default class BattleScene extends Phaser.Scene {
       }
     }
 
+    // Notify DEMON WARRIOR rage
+    if (this._state.orcRageActive && this._state._config.ai === 'demon_warrior') {
+      const wasRaging = this._enemy?.getData('rageShown');
+      if (!wasRaging) {
+        this._enemy?.setData('rageShown', true);
+        this._showDemonWarriorRage();
+      }
+    }
+
+    // Notify CURSED KNIGHT rage
+    if (this._state.orcRageActive && this._state._config.ai === 'cursed_knight') {
+      const wasRaging = this._enemy?.getData('rageShown');
+      if (!wasRaging) {
+        this._enemy?.setData('rageShown', true);
+        this._showCursedKnightRage();
+      }
+    }
+
+    // Notify JUNGLE BEAST frenzy
+    if (this._state.beastFrenzyActive && this._state._config.ai === 'jungle_beast') {
+      const wasFrenzy = this._enemy?.getData('frenzyShown');
+      if (!wasFrenzy) {
+        this._enemy?.setData('frenzyShown', true);
+        this._showBeastFrenzy();
+      }
+    }
+
     // Notify heal block from Shadow Lord
     if (this._state.heroHealBlocked) {
       this.showMessage('Le Seigneur des Ombres scelle votre soin !');
@@ -818,9 +891,24 @@ export default class BattleScene extends Phaser.Scene {
       case 'quake':         this._doTrollQuake();       break;
       case 'phase2':
         if (this._state._config.ai === 'cave_troll_king') { this._doTrollKingPhase2(); break; }
+        if (this._state._config.ai === 'ghost_knight') { this._doGhostKnightCorporeal(); break; }
+        if (this._state._config.ai === 'frost_troll')  { this._doFrostTrollPhase2();    break; }
         this._showPhase2Transition(); break;
       case 'poison':     this._doPiratePoison();     break;
       case 'cannonball': this._doPirateCannonball();  break;
+      case 'frostSmash':  this._doFrostSmash();         break;
+      case 'blizzard':    this._doBlizzard();            break;
+      case 'iceRegen':    this._doIceWitchRegen();       break;
+      case 'haunt':       this._doGhostKnightHaunt();    break;
+      case 'bloodDrain':  this._doBloodDrain();          break;
+      case 'fireSlash':   this._doFireSlash();           break;
+      case 'hellfire':    this._doDemonHellfire();       break;
+      case 'demonCurse':  this._doDemonCurse();          break;
+      case 'shieldCrush': this._doKnightShieldCrush(); break;
+      case 'pounce':      this._doBeastPounce();        break;
+      case 'boneSpear':   this._doSkeletonBoneSpear();  break;
+      case 'lichCurse':   this._doLichCurse();           break;
+      case 'soulDrain':   this._doLichSoulDrain();       break;
       default:       this._doEnemyAttack(); break;
     }
   }
@@ -842,6 +930,24 @@ export default class BattleScene extends Phaser.Scene {
               if (results[0].pillaged) {
                 this.floatText(this._enemy.x, this._enemy.y - 50, `PILLAGE ×${this._state.pillageStacks}`, '#FF9900');
               }
+              if (results[0].frenzy) {
+                this.floatText(this._enemy.x, this._enemy.y - 50, 'FRÉNÉSIE !', '#FFDD00');
+              }
+              if (results[0].vampireRegen > 0) {
+                this.floatText(this._enemy.x, this._enemy.y - 50, `+${results[0].vampireRegen}`, '#AA0000');
+              }
+          // Shadow Lord / Demon Lord double hit + Vampire bat swarm
+          if (results.length > 1 && results[1].isBatSwarm) {
+            this.time.delayedCall(250, () => {
+              this._explode(this._hero.x, this._hero.y - 20);
+              this.floatText(this._hero.x, this._hero.y - 50, `-${results[1].damage}`, '#AA2200');
+              this.floatText(this._hero.x + 20, this._hero.y - 30, 'NUÉE !', '#CC4400', true);
+              this._updateHpBars();
+              if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+              window.dispatchEvent(new CustomEvent('animation-end'));
+            });
+            return;
+          }
           // Shadow Lord double hit
           if (results.length > 1) {
             this.time.delayedCall(250, () => {
@@ -1128,6 +1234,430 @@ export default class BattleScene extends Phaser.Scene {
     });
   }
 
+  _doFrostSmash() {
+    this.showMessage('GIVRE FRACASSANT — le froid vous immobilise !');
+    this.cameras.main.shake(200, 0.025);
+    this.time.delayedCall(300, () => {
+      this._animEnemyAttack(this._enemy, this._enemyBaseX, () => {
+        const result = this._state.frostSmash();
+        if (result.shieldBroken) {
+          this._hero.clearTint();
+          this.floatText(this._hero.x, this._hero.y - 50, 'BOUCLIER BRISÉ !', '#FF4400');
+        }
+        const g = this.add.graphics();
+        this.tweens.add({
+          targets: { v: 0 }, v: 1, duration: 500, yoyo: true,
+          onUpdate: (tw) => {
+            const a = tw.getValue();
+            g.clear();
+            g.fillStyle(0x88CCFF, 0.35 * a); g.fillCircle(this._hero.x, this._hero.y, 65 * a);
+            g.lineStyle(2, 0xAADDFF, 0.7 * a); g.strokeCircle(this._hero.x, this._hero.y, 65 * a);
+          },
+          onComplete: () => g.destroy(),
+        });
+        this._hero.setTint(0x88CCFF);
+        this.time.delayedCall(1200, () => this._hero.clearTint());
+        this.floatText(this._hero.x, this._hero.y - 30, `-${result.damage}`, '#88CCFF', true);
+        this.floatText(this._hero.x + 25, this._hero.y - 52, `GELÉ ${result.frozenDuration} tours`, '#AADDFF');
+        this._updateHpBars();
+        if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+        window.dispatchEvent(new CustomEvent('animation-end'));
+      });
+    });
+  }
+
+  _doFrostTrollPhase2() {
+    const sprite = this._enemy;
+    this.showMessage('LE TROLL DU GIVRE ENTRE EN TEMPÊTE !');
+    const g = this.add.graphics();
+    this.tweens.add({
+      targets: { v: 0 }, v: 1, duration: 600, yoyo: true,
+      onUpdate: (tw) => {
+        const a = tw.getValue();
+        g.clear();
+        g.fillStyle(0x44AADD, 0.3 * a); g.fillCircle(sprite.x, sprite.y, 70 * a);
+        g.lineStyle(3, 0x88CCFF, 0.7 * a); g.strokeCircle(sprite.x, sprite.y, 70 * a);
+      },
+      onComplete: () => { g.destroy(); this._doEnemyAttack(); },
+    });
+    this.floatText(sprite.x, sprite.y - 50, 'TEMPÊTE DE GIVRE !', '#88CCFF', true);
+    this.cameras.main.shake(200, 0.02);
+  }
+
+  _doBlizzard() {
+    this.showMessage('BLIZZARD — la Sorcière de Glace déchaîne la tempête !');
+    this.time.delayedCall(380, () => {
+      const result = this._state.blizzard();
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 700, yoyo: true,
+        onUpdate: (tween) => {
+          const a = tween.getValue();
+          g.clear();
+          g.fillStyle(0x0044AA, 0.25 * a); g.fillRect(0, 0, 800, 450);
+          g.fillStyle(0xAADDFF, 0.4 * a); g.fillCircle(this._hero.x, this._hero.y, 60 * a + 20);
+          g.lineStyle(2, 0x88BBFF, 0.6 * a); g.strokeCircle(this._hero.x, this._hero.y, 60 * a + 20);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this._hero.setTint(0x88CCFF);
+      this.time.delayedCall(1400, () => this._hero.clearTint());
+      this._explode(this._hero.x, this._hero.y - 20);
+      this.floatText(this._hero.x, this._hero.y - 30, `-${result.damage}`, '#88CCFF', true);
+      this.floatText(this._hero.x + 25, this._hero.y - 52, `GELÉ ${result.frozenDuration} tours`, '#AADDFF');
+      this._updateHpBars();
+      if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doIceWitchRegen() {
+    this.showMessage('La Sorcière de Glace se régénère !');
+    this.time.delayedCall(380, () => {
+      const result = this._state.iceWitchRegen();
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 600, yoyo: true,
+        onUpdate: (tw) => {
+          const a = tw.getValue();
+          g.clear();
+          g.fillStyle(0x0066CC, 0.22 * a); g.fillCircle(this._enemy.x, this._enemy.y, 50 * a + 20);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this.floatText(this._enemy.x, this._enemy.y - 30, `+${result.healed}`, '#88CCFF', true);
+      this._updateHpBars();
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doGhostKnightHaunt() {
+    this.showMessage('Le Chevalier Fantôme vous hante — terreur spectrale !');
+    this.time.delayedCall(380, () => {
+      const result = this._state.ghostKnightHaunt();
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 600, yoyo: true,
+        onUpdate: (tween) => {
+          const a = tween.getValue();
+          g.clear();
+          g.fillStyle(0x8899BB, 0.25 * a); g.fillCircle(this._hero.x, this._hero.y, 60 * a + 20);
+          g.lineStyle(2, 0xAABBDD, 0.5 * a); g.strokeCircle(this._hero.x, this._hero.y, 60 * a + 20);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this._hero.setTint(0x8899CC);
+      this.time.delayedCall(800, () => this._hero.clearTint());
+      this.floatText(this._hero.x, this._hero.y - 30, 'HANTÉ !', '#AABBDD', true);
+      this.showMessage(`Terreur ! Attaques du héros à 40% pendant ${result.curseDuration} tour.`);
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doGhostKnightCorporeal() {
+    const sprite = this._enemy;
+    this.showMessage('LE CHEVALIER FANTÔME SE MATÉRIALISE !');
+    const g = this.add.graphics();
+    this.tweens.add({
+      targets: { v: 0 }, v: 1, duration: 600, yoyo: true,
+      onUpdate: (tw) => {
+        const a = tw.getValue();
+        g.clear();
+        g.fillStyle(0xCCDDFF, 0.25 * a); g.fillCircle(sprite.x, sprite.y, 65 * a);
+        g.lineStyle(3, 0xEEEEFF, 0.7 * a); g.strokeCircle(sprite.x, sprite.y, 65 * a);
+      },
+      onComplete: () => { g.destroy(); this._doEnemyAttack(); },
+    });
+    this.floatText(sprite.x, sprite.y - 50, 'CORPORÉEL !', '#CCDDFF', true);
+    this.cameras.main.shake(180, 0.018);
+  }
+
+  _doBloodDrain() {
+    this.showMessage('Le Comte Vampire vous draine le sang !');
+    this.time.delayedCall(350, () => {
+      this._animEnemyAttack(this._enemy, this._enemyBaseX, () => {
+        const result = this._state.bloodDrain();
+        const g = this.add.graphics();
+        this.tweens.add({
+          targets: { v: 0 }, v: 1, duration: 500, yoyo: true,
+          onUpdate: (tw) => {
+            const a = tw.getValue();
+            g.clear();
+            g.lineStyle(3, 0xCC0000, 0.7 * a);
+            g.lineBetween(this._hero.x, this._hero.y - 20, this._enemy.x, this._enemy.y - 20);
+            g.fillStyle(0x660000, 0.25 * a); g.fillCircle(this._hero.x, this._hero.y, 50 * a);
+          },
+          onComplete: () => g.destroy(),
+        });
+        this._hero.setTint(0xCC2222);
+        this.time.delayedCall(600, () => this._hero.clearTint());
+        this.floatText(this._hero.x, this._hero.y - 40, `-${result.damage} SANG`, '#CC0000', true);
+        if (result.healed > 0) this.floatText(this._enemy.x, this._enemy.y - 50, `+${result.healed}`, '#AA0000');
+        this._updateHpBars();
+        if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+        window.dispatchEvent(new CustomEvent('animation-end'));
+      });
+    });
+  }
+
+  _doFireSlash() {
+    this.showMessage('TAILLADE DE FEU — les flammes vous consument !');
+    this.time.delayedCall(300, () => {
+      this._animEnemyAttack(this._enemy, this._enemyBaseX, () => {
+        const result = this._state.fireSlash();
+        this.cameras.main.shake(200, 0.025);
+        const g = this.add.graphics();
+        this.tweens.add({
+          targets: { v: 0 }, v: 1, duration: 400, yoyo: true,
+          onUpdate: (tw) => {
+            const a = tw.getValue();
+            g.clear();
+            g.fillStyle(0xFF4400, 0.45 * a); g.fillCircle(this._hero.x, this._hero.y, 65 * a);
+            g.lineStyle(3, 0xFF8800, 0.7 * a); g.strokeCircle(this._hero.x, this._hero.y, 65 * a);
+          },
+          onComplete: () => g.destroy(),
+        });
+        this._hero.setTint(0xFF4400);
+        this._explode(this._hero.x, this._hero.y - 20);
+        this._screenFlash();
+        this.floatText(this._hero.x, this._hero.y - 30, `-${result.damage}`, '#FF4400', true);
+        this.floatText(this._hero.x + 25, this._hero.y - 52, `BRÛLURE -${result.burnDamage}/tour`, '#FF8800');
+        this._updateHpBars();
+        if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+        window.dispatchEvent(new CustomEvent('animation-end'));
+      });
+    });
+  }
+
+  _showDemonWarriorRage() {
+    const sprite = this._enemy;
+    this.showMessage('Le Guerrier Démon entre en RAGE INFERNALE !');
+    const g = this.add.graphics();
+    this.tweens.add({
+      targets: { v: 0 }, v: 1, duration: 500, yoyo: true,
+      onUpdate: (tw) => {
+        const a = tw.getValue();
+        g.clear();
+        g.fillStyle(0xFF2200, 0.35 * a); g.fillCircle(sprite.x, sprite.y, 70 * a);
+        g.lineStyle(2, 0xFF6600, 0.7 * a); g.strokeCircle(sprite.x, sprite.y, 70 * a);
+      },
+      onComplete: () => g.destroy(),
+    });
+    this.floatText(sprite.x, sprite.y - 50, 'RAGE INFERNALE !', '#FF4400', true);
+    this.cameras.main.shake(150, 0.015);
+  }
+
+  _doDemonHellfire() {
+    this.showMessage('FEU DE L\'ENFER — l\'enfer se déchaîne !');
+    this.cameras.main.shake(300, 0.045);
+    this.time.delayedCall(400, () => {
+      const result = this._state.hellfire();
+      if (result.shieldBroken) { this._hero.clearTint(); this.floatText(this._hero.x, this._hero.y - 55, 'BOUCLIER BRISÉ !', '#FF4400'); }
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 450, yoyo: true,
+        onUpdate: (tw) => {
+          const a = tw.getValue();
+          g.clear();
+          g.fillStyle(0xFF2200, 0.55 * a); g.fillRect(0, 0, 800, 450);
+          g.fillStyle(0xFF6600, 0.4 * a); g.fillCircle(this._hero.x, this._hero.y, 90 * a);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this._hero.setTint(0xFF3300);
+      this._screenFlash();
+      this.floatText(this._hero.x, this._hero.y - 40, `FEU INFERNAL ! -${result.damage}`, '#FF4400', true);
+      this.floatText(this._hero.x + 25, this._hero.y - 62, `BRÛLURE -${result.burnDamage}/tour`, '#FF8800');
+      this._updateHpBars();
+      if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doDemonCurse() {
+    this.showMessage('Le Seigneur Démon vous maudit !');
+    this.time.delayedCall(380, () => {
+      const result = this._state.demonCurse();
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 600, yoyo: true,
+        onUpdate: (tween) => {
+          const a = tween.getValue();
+          g.clear();
+          g.fillStyle(0x880000, 0.30 * a); g.fillCircle(this._hero.x, this._hero.y, 60 * a + 20);
+          g.lineStyle(2, 0xFF2200, 0.5 * a); g.strokeCircle(this._hero.x, this._hero.y, 60 * a + 20);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this._hero.setTint(0xAA2200);
+      this.time.delayedCall(800, () => this._hero.clearTint());
+      this.floatText(this._hero.x, this._hero.y - 30, 'MAUDIT !', '#FF2200', true);
+      this.showMessage(`Malédiction Démoniaque ! Attaques du héros réduites pendant ${result.curseDuration} tours.`);
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doKnightShieldCrush() {
+    this.showMessage('FRAPPE MAUDITE — bouclier pulvérisé !');
+    this.time.delayedCall(350, () => {
+      const result = this._state.shieldCrush();
+      if (result.shieldBroken) {
+        this._hero.clearTint();
+        this.floatText(this._hero.x, this._hero.y - 50, 'BOUCLIER BRISÉ !', '#FF4400');
+      }
+      this.cameras.main.shake(200, 0.025);
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 400, yoyo: true,
+        onUpdate: (tw) => {
+          const a = tw.getValue();
+          g.clear();
+          g.fillStyle(0x6600BB, 0.4 * a); g.fillCircle(this._hero.x, this._hero.y, 65 * a);
+          g.lineStyle(3, 0xAA00FF, 0.7 * a); g.strokeCircle(this._hero.x, this._hero.y, 65 * a);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this._explode(this._hero.x, this._hero.y - 20);
+      this.floatText(this._hero.x, this._hero.y - 30, `-${result.damage}`, '#CC00FF', true);
+      this._updateHpBars();
+      if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _showCursedKnightRage() {
+    const sprite = this._enemy;
+    this.showMessage('Le Chevalier Maudit s\'embrase de fureur maudite !');
+    const g = this.add.graphics();
+    this.tweens.add({
+      targets: { v: 0 }, v: 1, duration: 500, yoyo: true,
+      onUpdate: (tw) => {
+        const a = tw.getValue();
+        g.clear();
+        g.fillStyle(0x8800CC, 0.35 * a); g.fillCircle(sprite.x, sprite.y, 65 * a);
+        g.lineStyle(2, 0xCC00FF, 0.7 * a); g.strokeCircle(sprite.x, sprite.y, 65 * a);
+      },
+      onComplete: () => g.destroy(),
+    });
+    this.floatText(sprite.x, sprite.y - 50, 'FUREUR MAUDITE !', '#CC00FF', true);
+    this.cameras.main.shake(150, 0.015);
+  }
+
+  _doBeastPounce() {
+    this.showMessage(`${this._enemyConfig.name} bondit sur vous !`);
+    this.time.delayedCall(250, () => {
+      this._animEnemyAttack(this._enemy, this._enemyBaseX, () => {
+        const result = this._state.beastPounce();
+        this._explode(this._hero.x, this._hero.y - 20);
+        this._hitSpark(this._hero.x - 30, this._hero.y - 30);
+        this.floatText(this._hero.x, this._hero.y - 40, `-${result.hit1.damage}`, '#FF8800', true);
+        this.cameras.main.shake(150, 0.02);
+        this._updateHpBars();
+        if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+        if (result.hit2) {
+          this.time.delayedCall(250, () => {
+            this._explode(this._hero.x, this._hero.y - 10);
+            this.floatText(this._hero.x + 20, this._hero.y - 30, `-${result.hit2.damage}`, '#FF8800');
+            this.floatText(this._hero.x, this._hero.y - 58, 'BOND !', '#CCAA00', true);
+            this._updateHpBars();
+            if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+            window.dispatchEvent(new CustomEvent('animation-end'));
+          });
+        } else {
+          window.dispatchEvent(new CustomEvent('animation-end'));
+        }
+      });
+    });
+  }
+
+  _showBeastFrenzy() {
+    const sprite = this._enemy;
+    this.showMessage('La bête entre en FRÉNÉSIE !');
+    const g = this.add.graphics();
+    this.tweens.add({
+      targets: { v: 0 }, v: 1, duration: 500, yoyo: true,
+      onUpdate: (tw) => {
+        const a = tw.getValue();
+        g.clear();
+        g.fillStyle(0xAAAA00, 0.3 * a); g.fillCircle(sprite.x, sprite.y, 60 * a);
+        g.lineStyle(2, 0xFFDD00, 0.6 * a); g.strokeCircle(sprite.x, sprite.y, 60 * a);
+      },
+      onComplete: () => g.destroy(),
+    });
+    this.floatText(sprite.x, sprite.y - 50, 'FRÉNÉSIE !', '#FFDD00', true);
+    this.cameras.main.shake(120, 0.012);
+  }
+
+  _doSkeletonBoneSpear() {
+    this.showMessage('Le Squelette lance une Lance d\'Os !');
+    this.time.delayedCall(350, () => {
+      const result = this._state.boneSpear();
+      const g = this.add.graphics();
+      g.lineStyle(3, 0xC8B870, 1);
+      g.lineBetween(this._enemy.x - 20, this._enemy.y - 30, this._hero.x, this._hero.y - 20);
+      this.time.delayedCall(150, () => g.destroy());
+      this.cameras.main.shake(120, 0.012);
+      this._explode(this._hero.x, this._hero.y - 20);
+      this.floatText(this._hero.x, this._hero.y - 30, `-${result.damage}`, '#D4C890', true);
+      this.floatText(this._hero.x + 25, this._hero.y - 52, 'PERCE-DEF !', '#FFDD44');
+      this._updateHpBars();
+      if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doLichCurse() {
+    this.showMessage('La Liche tisse un sort de Mort Lente !');
+    this.time.delayedCall(380, () => {
+      const result = this._state.lichCurse();
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 600, yoyo: true,
+        onUpdate: (tween) => {
+          const a = tween.getValue();
+          g.clear();
+          g.fillStyle(0x004422, 0.30 * a); g.fillCircle(this._hero.x, this._hero.y, 60 * a + 20);
+          g.lineStyle(2, 0x00CC88, 0.5 * a); g.strokeCircle(this._hero.x, this._hero.y, 60 * a + 20);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this._hero.setTint(0x00AA66);
+      this.time.delayedCall(800, () => this._hero.clearTint());
+      this.floatText(this._hero.x, this._hero.y - 30, 'MAUDIT !', '#00CC88', true);
+      this.showMessage(`Malédiction de Mort ! Attaques du héros réduites pendant ${result.curseDuration} tours.`);
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
+  _doLichSoulDrain() {
+    this.showMessage('La Liche draine votre âme !');
+    this.time.delayedCall(400, () => {
+      const result = this._state.soulDrain();
+      const g = this.add.graphics();
+      this.tweens.add({
+        targets: { v: 0 }, v: 1, duration: 500, yoyo: true,
+        onUpdate: (tw) => {
+          const a = tw.getValue();
+          g.clear();
+          g.lineStyle(3, 0x00FF88, 0.7 * a);
+          g.lineBetween(this._hero.x, this._hero.y - 20, this._enemy.x, this._enemy.y - 30);
+          g.fillStyle(0x004422, 0.25 * a); g.fillCircle(this._hero.x, this._hero.y, 55 * a);
+        },
+        onComplete: () => g.destroy(),
+      });
+      this._hero.setTint(0x00AA66);
+      this.time.delayedCall(600, () => this._hero.clearTint());
+      this._screenFlash();
+      this.floatText(this._hero.x, this._hero.y - 40, `-${result.damage} ÂME`, '#00FF88', true);
+      if (result.soulDrained > 0) {
+        this.floatText(this._enemy.x, this._enemy.y - 50, `+${result.soulDrained}`, '#00FF88');
+      }
+      this._updateHpBars();
+      if (this._state.isHeroDead()) { this.time.delayedCall(700, () => this._onHeroDefeated()); return; }
+      window.dispatchEvent(new CustomEvent('animation-end'));
+    });
+  }
+
   _animEnemyAttack(sprite, baseX, onImpact) {
     const prefix = this._enemyPrefix;
     sprite.play(`${prefix}-walk`);
@@ -1199,15 +1729,26 @@ export default class BattleScene extends Phaser.Scene {
       const proceed = () => {
         const nextIdx = this._battleSeqIdx + 1;
         if (nextIdx < this._battleSequence.length) {
+          // Soin partiel de 30% entre les combats, les HP s'accumulent sinon
+          const heal     = Math.floor(this._state.heroMaxHp * 0.30);
+          const heroHp   = Math.min(this._state.heroMaxHp, this._state.heroHp + heal);
+          this.floatText(this._hero.x, this._hero.y - 30, `+${heroHp - this._state.heroHp} repos`, '#22C55E');
           this.scene.start('BattleScene', {
             villageId: this._villageId,
             seqIdx:    nextIdx,
+            heroHp,
           });
         } else {
           const loot = ps ? this._generateLoot() : null;
           if (loot && ps) ps.addToInventory(loot);
+          // Récompense exclusive : Pioche du Mineur garantie en fin de Mine
+          let bonusLoot = null;
+          if (this._villageId === 'mine' && ps && !ps.ownedIds().includes('pickaxe-miner')) {
+            bonusLoot = 'pickaxe-miner';
+            ps.addToInventory(bonusLoot);
+          }
           window.dispatchEvent(new CustomEvent('village-cleared', {
-            detail: { villageId: this._villageId, loot },
+            detail: { villageId: this._villageId, loot, bonusLoot },
           }));
         }
       };
@@ -1268,7 +1809,8 @@ export default class BattleScene extends Phaser.Scene {
   }
 
   _generateLoot() {
-    return rollLoot(window.playerState?.ownedIds() ?? []);
+    const zoneDiff = VILLAGES[this._villageId]?.diff ?? 1;
+    return rollLoot(window.playerState?.ownedIds() ?? [], zoneDiff);
   }
 
   shutdown() {

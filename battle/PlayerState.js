@@ -9,8 +9,8 @@ export default class PlayerState {
     this.clearedVillages = new Set();
     this.currentVillage  = MAP_START;
     this.baseStats       = { hp: 55, atk: 10, def: 0, spd: 6, lck: 3 };
-    this.equipped        = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null };
-    this.inventory       = ['sword-iron', 'armor-leather', 'helmet-iron'];
+    this.equipped        = { weapon: 'sword-iron', armor: 'armor-leather', helmet: 'helmet-iron', accessory1: null, accessory2: null };
+    this.inventory       = [];
   }
 
   isVillageUnlocked(villageId) {
@@ -32,8 +32,8 @@ export default class PlayerState {
     this.level           = 1;
     this.exp             = 0;
     this.baseStats       = { hp: 55, atk: 10, def: 0, spd: 6, lck: 3 };
-    this.inventory       = ['sword-iron', 'armor-leather', 'helmet-iron'];
-    this.equipped        = { weapon: null, armor: null, helmet: null, accessory1: null, accessory2: null };
+    this.inventory       = [];
+    this.equipped        = { weapon: 'sword-iron', armor: 'armor-leather', helmet: 'helmet-iron', accessory1: null, accessory2: null };
   }
 
   save() {

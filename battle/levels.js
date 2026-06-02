@@ -1,28 +1,29 @@
 export const MAX_LEVEL = 20;
 
 // EXP required to advance FROM level N (index = current level)
-// Calibrated so the player gains exactly 1 level per battle across 5 fights
+// Calibrated so that completing all 10 villages (~1825 total EXP) brings the player to L20.
+// Skipping the Mine (optional, 245 EXP) lands around L18.
 export const EXP_TO_NEXT = [
   0,    // 0 (unused)
-  20,   // 1 → 2
-  40,   // 2 → 3
-  68,   // 3 → 4
-  104,  // 4 → 5
-  148,  // 5 → 6
-  200,  // 6 → 7
-  260,  // 7 → 8
-  328,  // 8 → 9
-  404,  // 9 → 10
-  488,  // 10 → 11
-  580,  // 11 → 12
-  680,  // 12 → 13
-  788,  // 13 → 14
-  904,  // 14 → 15
-  1028, // 15 → 16
-  1160, // 16 → 17
-  1300, // 17 → 18
-  1448, // 18 → 19
-  1604, // 19 → 20
+  25,   // 1 → 2   (après Hameau combat 1)
+  35,   // 2 → 3   (fin Hameau)
+  50,   // 3 → 4   (début Forêt)
+  65,   // 4 → 5   (fin Forêt)
+  80,   // 5 → 6   (Mine / début Plage)
+  95,   // 6 → 7
+  100,  // 7 → 8   (fin Mine / mid Plage)
+  108,  // 8 → 9
+  115,  // 9 → 10  (fin Plage / Temple)
+  118,  // 10 → 11
+  120,  // 11 → 12 (Jungle)
+  120,  // 12 → 13
+  115,  // 13 → 14 (Glacier)
+  118,  // 14 → 15
+  115,  // 15 → 16 (Catacombes)
+  115,  // 16 → 17
+  115,  // 17 → 18 (Château / début Cité)
+  112,  // 18 → 19
+  104,  // 19 → 20 (fin Cité — total cumulé : 1825)
 ];
 
 // Stat gains [hp, atk, def, spd, lck] when REACHING level N (index = new level)

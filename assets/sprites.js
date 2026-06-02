@@ -1654,3 +1654,937 @@ export function createPirateCaptainDefendSheet() {
   for (let i = 0; i < frames; i++) drawPirate(ctx, i * PIR_FW, 0, { defending: true, captain: true });
   return { canvas: c, frameWidth: PIR_FW, frameHeight: PIR_FH, frameCount: frames };
 }
+
+// ── CHEVALIER MAUDIT ──────────────────────────────────────────────────────────
+const CKN_FW = 72, CKN_FH = 88;
+const CKNC = {
+  plate:  '#160A24', plateM: '#20103A', plateD: '#0A0514',
+  trim:   '#440088', trimB:  '#6600BB', trimG:  '#8822DD',
+  eye:    '#CC00FF', eyeC:   '#FF88FF',
+  sword:  '#6A6870', swordD: '#3A3840', swordE: '#AAAACC',
+  boot:   '#080010',
+};
+
+function drawCursedKnight(ctx, ox, oy, {
+  bodyDY = 0, swordPos = 'normal', defending = false,
+} = {}) {
+  const b = bodyDY;
+
+  // Sword (left side, behind body)
+  if (!defending) {
+    const sy = swordPos === 'raised' ? oy + 0 + b : oy + 14 + b;
+    box(ctx, ox + 4, sy + 4, 5, 44, 1, CKNC.swordD, OC, 1);
+    box(ctx, ox + 3, sy + 4, 3, 44, 0, CKNC.swordE, CKNC.swordE, 0);
+    box(ctx, ox + 0, sy + 2, 13, 5, 2, CKNC.plate,  CKNC.plateD, 1);
+    ctx.save(); ctx.shadowColor = CKNC.trimB; ctx.shadowBlur = 10;
+    fillR(ctx, ox + 5, sy + 4, 3, 44, CKNC.trim);
+    ctx.restore();
+  }
+
+  // Legs
+  box(ctx, ox + 16, oy + 68 + b, 16, 18, 3, CKNC.plate, CKNC.plateD, 1);
+  box(ctx, ox + 40, oy + 68 + b, 16, 18, 3, CKNC.plate, CKNC.plateD, 1);
+  box(ctx, ox + 14, oy + 78 + b, 20,  8, 2, CKNC.boot,  OC, 1);
+  box(ctx, ox + 38, oy + 78 + b, 20,  8, 2, CKNC.boot,  OC, 1);
+
+  // Body
+  box(ctx, ox + 10, oy + 36 + b, 52, 34, 5, CKNC.plate, CKNC.plateD, 1.5);
+  // Chest rune
+  ctx.save(); ctx.shadowColor = CKNC.trimB; ctx.shadowBlur = 10;
+  circ(ctx, ox + 36, oy + 52 + b, 8, CKNC.plateM, CKNC.trimB, 2);
+  circ(ctx, ox + 36, oy + 52 + b, 4, CKNC.trim,   CKNC.trimG, 0);
+  ctx.restore();
+  box(ctx, ox + 12, oy + 48 + b, 48, 2, 0, CKNC.plateD, CKNC.plateD, 0);
+  box(ctx, ox + 12, oy + 60 + b, 48, 2, 0, CKNC.plateD, CKNC.plateD, 0);
+  box(ctx, ox + 10, oy + 66 + b, 52, 5, 2, CKNC.plateD, OC, 1);
+
+  // Shoulder pads + spikes
+  box(ctx, ox +  2, oy + 32 + b, 14, 12, 3, CKNC.plateM, CKNC.plateD, 1);
+  box(ctx, ox + 56, oy + 32 + b, 14, 12, 3, CKNC.plateM, CKNC.plateD, 1);
+  poly(ctx, [[ox+9,  oy+30+b],[ox+6,  oy+22+b],[ox+12, oy+30+b]], CKNC.plateD, OC, 1);
+  poly(ctx, [[ox+63, oy+30+b],[ox+66, oy+22+b],[ox+60, oy+30+b]], CKNC.plateD, OC, 1);
+
+  // Arms
+  box(ctx, ox +  0, oy + 40 + b, 12, 26, 3, CKNC.plate, CKNC.plateD, 1);
+  box(ctx, ox + 60, oy + 40 + b, 12, 26, 3, CKNC.plate, CKNC.plateD, 1);
+  box(ctx, ox +  0, oy + 62 + b, 12,  8, 2, CKNC.plateD, OC, 1);
+  box(ctx, ox + 60, oy + 62 + b, 12,  8, 2, CKNC.plateD, OC, 1);
+
+  // Helmet
+  box(ctx, ox + 14, oy + 10 + b, 44, 28, 4, CKNC.plate, CKNC.plateD, 1.5);
+  box(ctx, ox + 18, oy + 22 + b, 36,  8, 1, CKNC.trim,  CKNC.plateD, 1);
+  ctx.save(); ctx.shadowColor = CKNC.eye; ctx.shadowBlur = 12;
+  circ(ctx, ox + 28, oy + 26 + b, 3, CKNC.eye,  CKNC.eye,  0);
+  circ(ctx, ox + 44, oy + 26 + b, 3, CKNC.eye,  CKNC.eye,  0);
+  ctx.restore();
+  circ(ctx, ox + 28, oy + 26 + b, 2, CKNC.eyeC, CKNC.eyeC, 0);
+  circ(ctx, ox + 44, oy + 26 + b, 2, CKNC.eyeC, CKNC.eyeC, 0);
+  poly(ctx, [[ox+26, oy+10+b],[ox+36, oy+2+b],[ox+46, oy+10+b]], CKNC.plateM, CKNC.plateD, 1);
+}
+
+export function createCursedKnightIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, CKN_FW, CKN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [0,1,0,1].forEach((dy, i) => drawCursedKnight(ctx, i * CKN_FW, 0, { bodyDY: dy }));
+  return { canvas: c, frameWidth: CKN_FW, frameHeight: CKN_FH, frameCount: frames };
+}
+export function createCursedKnightWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, CKN_FW, CKN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [{bodyDY:2},{bodyDY:0},{bodyDY:2},{bodyDY:0}].forEach((cfg, i) => drawCursedKnight(ctx, i * CKN_FW, 0, cfg));
+  return { canvas: c, frameWidth: CKN_FW, frameHeight: CKN_FH, frameCount: frames };
+}
+export function createCursedKnightAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, CKN_FW, CKN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [
+    { swordPos: 'normal' },
+    { swordPos: 'raised', bodyDY: -2 },
+    { swordPos: 'raised', bodyDY: -3 },
+    { swordPos: 'normal', bodyDY:  2 },
+  ].forEach((cfg, i) => drawCursedKnight(ctx, i * CKN_FW, 0, cfg));
+  return { canvas: c, frameWidth: CKN_FW, frameHeight: CKN_FH, frameCount: frames };
+}
+export function createCursedKnightDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, CKN_FW, CKN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawCursedKnight(ctx, i * CKN_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: CKN_FW, frameHeight: CKN_FH, frameCount: frames };
+}
+
+// ── BÊTE DE LA JUNGLE ────────────────────────────────────────────────────────
+const JB_FW = 80, JB_FH = 72;
+const JBC = {
+  fur:    '#1C2210', furM:  '#2E3818', furD:   '#0E1208',
+  spot:   '#0A1008',
+  muzzle: '#242E12',
+  eye:    '#CCAA00', eyeC:  '#FFDD22',
+  claw:   '#C4BC88', clawD: '#8C8460',
+  fang:   '#DED896',
+};
+
+function drawJungleBeast(ctx, ox, oy, {
+  frame = 0, walking = false, attacking = false,
+} = {}) {
+  const bobY = walking ? (frame % 2 === 0 ? 2 : -1) : 0;
+  const oy2  = oy + bobY;
+
+  // Tail
+  poly(ctx, [[ox+68,oy2+38],[ox+80,oy2+32],[ox+78,oy2+44]], JBC.fur,  JBC.furD, 1);
+  poly(ctx, [[ox+68,oy2+38],[ox+76,oy2+46],[ox+72,oy2+50]], JBC.furD, JBC.furD, 1);
+
+  // Body (hunched, wide)
+  box(ctx, ox + 14, oy2 + 24, 54, 32, 10, JBC.furM, JBC.furD, 1.5);
+  circ(ctx, ox + 28, oy2 + 30, 4, JBC.spot, JBC.spot, 0);
+  circ(ctx, ox + 52, oy2 + 28, 3, JBC.spot, JBC.spot, 0);
+  circ(ctx, ox + 42, oy2 + 44, 4, JBC.spot, JBC.spot, 0);
+  circ(ctx, ox + 22, oy2 + 46, 3, JBC.spot, JBC.spot, 0);
+
+  // Forelegs / arms
+  const armY = attacking ? oy2 + 16 : oy2 + 26;
+  box(ctx, ox +  4, armY, 14, 26, 4, JBC.fur, JBC.furD, 1);
+  box(ctx, ox + 62, armY, 14, 26, 4, JBC.fur, JBC.furD, 1);
+  for (let i = 0; i < 3; i++) {
+    fillR(ctx, ox +  5 + i * 4, armY + 24, 3, 6, JBC.claw);
+    fillR(ctx, ox + 63 + i * 4, armY + 24, 3, 6, JBC.claw);
+  }
+
+  // Hind legs
+  const ll = walking && frame % 2 === 0 ? oy2 + 48 : oy2 + 50;
+  const rl = walking && frame % 2 === 1 ? oy2 + 48 : oy2 + 50;
+  box(ctx, ox + 20, ll, 14, 18, 3, JBC.fur, JBC.furD, 1);
+  box(ctx, ox + 46, rl, 14, 18, 3, JBC.fur, JBC.furD, 1);
+  box(ctx, ox + 18, ll + 14, 18, 6, 2, JBC.furD, OC, 1);
+  box(ctx, ox + 44, rl + 14, 18, 6, 2, JBC.furD, OC, 1);
+
+  // Head
+  const hx = attacking ? ox + 2 : ox + 10;
+  box(ctx, hx,     oy2 + 4,  38, 28, 6, JBC.furM,   JBC.furD, 1.5);
+  box(ctx, hx + 6, oy2 + 16, 26, 14, 5, JBC.muzzle, JBC.furD, 1);
+  poly(ctx, [[hx+10,oy2+26],[hx+ 8,oy2+34],[hx+13,oy2+27]], JBC.fang, JBC.furD, 1);
+  poly(ctx, [[hx+28,oy2+26],[hx+30,oy2+34],[hx+25,oy2+27]], JBC.fang, JBC.furD, 1);
+  ctx.save(); ctx.shadowColor = JBC.eyeC; ctx.shadowBlur = 8;
+  circ(ctx, hx +  9, oy2 + 12, 5, JBC.eye,  JBC.eye,  0);
+  circ(ctx, hx + 29, oy2 + 12, 5, JBC.eye,  JBC.eye,  0);
+  ctx.restore();
+  circ(ctx, hx +  9, oy2 + 12, 3, JBC.eyeC, JBC.eyeC, 0);
+  circ(ctx, hx + 29, oy2 + 12, 3, JBC.eyeC, JBC.eyeC, 0);
+  poly(ctx, [[hx+ 4,oy2+4],[hx+ 0,oy2-4],[hx+10,oy2+6]], JBC.fur, JBC.furD, 1);
+  poly(ctx, [[hx+34,oy2+4],[hx+38,oy2-4],[hx+28,oy2+6]], JBC.fur, JBC.furD, 1);
+}
+
+export function createJungleBeastIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, JB_FW, JB_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawJungleBeast(ctx, i * JB_FW, 0, { frame: i });
+  return { canvas: c, frameWidth: JB_FW, frameHeight: JB_FH, frameCount: frames };
+}
+export function createJungleBeastWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, JB_FW, JB_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawJungleBeast(ctx, i * JB_FW, 0, { frame: i, walking: true });
+  return { canvas: c, frameWidth: JB_FW, frameHeight: JB_FH, frameCount: frames };
+}
+export function createJungleBeastAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, JB_FW, JB_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawJungleBeast(ctx, i * JB_FW, 0, { frame: i, attacking: i >= 2 });
+  return { canvas: c, frameWidth: JB_FW, frameHeight: JB_FH, frameCount: frames };
+}
+export function createJungleBeastDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, JB_FW, JB_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawJungleBeast(ctx, i * JB_FW, 0, {});
+  return { canvas: c, frameWidth: JB_FW, frameHeight: JB_FH, frameCount: frames };
+}
+
+// ── SQUELETTE MAUDIT ─────────────────────────────────────────────────────────
+const SKL_FW = 64, SKL_FH = 88;
+const SKLC = {
+  bone:   '#D4C890', boneM:  '#B8AC70', boneD:  '#786C30',
+  eye:    '#FF6600', eyeC:   '#FFAA00',
+  joint:  '#8C8050',
+  hollow: '#120A00',
+  sword:  '#A09060', swordD: '#706030', swordE: '#D8C880',
+  armor:  '#7A7060', armorD: '#4A4030',
+};
+
+function drawSkeleton(ctx, ox, oy, {
+  bodyDY = 0, swordPos = 'normal', defending = false,
+} = {}) {
+  const b = bodyDY;
+
+  // Sword (left side)
+  if (!defending) {
+    const sy = swordPos === 'raised' ? oy + 2 + b : oy + 16 + b;
+    box(ctx, ox + 4, sy,     4, 40, 1, SKLC.swordD, OC, 1);
+    box(ctx, ox + 3, sy,     2, 40, 0, SKLC.swordE, SKLC.swordE, 0);
+    box(ctx, ox + 0, sy - 2, 12,  5, 1, SKLC.armor,  SKLC.armorD, 1);
+  }
+
+  // Legs — femur
+  box(ctx, ox + 16, oy + 62 + b, 10, 18, 2, SKLC.bone, SKLC.boneD, 1);
+  box(ctx, ox + 38, oy + 62 + b, 10, 18, 2, SKLC.bone, SKLC.boneD, 1);
+  circ(ctx, ox + 21, oy + 62 + b, 5, SKLC.joint, SKLC.boneD, 1);
+  circ(ctx, ox + 43, oy + 62 + b, 5, SKLC.joint, SKLC.boneD, 1);
+  // Tibia
+  box(ctx, ox + 18, oy + 74 + b, 8, 14, 1, SKLC.bone, SKLC.boneD, 1);
+  box(ctx, ox + 38, oy + 74 + b, 8, 14, 1, SKLC.bone, SKLC.boneD, 1);
+
+  // Pelvis
+  box(ctx, ox + 12, oy + 58 + b, 40, 8, 2, SKLC.bone, SKLC.boneD, 1);
+
+  // Ribcage
+  box(ctx, ox + 16, oy + 34 + b, 32, 26, 3, SKLC.bone, SKLC.boneD, 1.5);
+  for (let r = 0; r < 3; r++) {
+    box(ctx, ox + 16, oy + 36 + r * 8 + b, 32, 2, 0, SKLC.boneD, SKLC.boneD, 0);
+  }
+  box(ctx, ox + 28, oy + 34 + b, 8, 26, 1, SKLC.boneM, SKLC.boneD, 1);
+
+  // Shoulder joints
+  circ(ctx, ox + 16, oy + 36 + b, 5, SKLC.joint, SKLC.boneD, 1);
+  circ(ctx, ox + 48, oy + 36 + b, 5, SKLC.joint, SKLC.boneD, 1);
+
+  // Arms — humerus
+  box(ctx, ox +  6, oy + 38 + b, 8, 18, 2, SKLC.bone, SKLC.boneD, 1);
+  box(ctx, ox + 50, oy + 38 + b, 8, 18, 2, SKLC.bone, SKLC.boneD, 1);
+  circ(ctx, ox + 10, oy + 54 + b, 4, SKLC.joint, SKLC.boneD, 1);
+  circ(ctx, ox + 54, oy + 54 + b, 4, SKLC.joint, SKLC.boneD, 1);
+  // Forearm
+  box(ctx, ox +  6, oy + 56 + b, 8, 14, 1, SKLC.bone, SKLC.boneD, 1);
+  box(ctx, ox + 50, oy + 56 + b, 8, 14, 1, SKLC.bone, SKLC.boneD, 1);
+
+  // Skull — cranium
+  box(ctx, ox + 16, oy + 8 + b, 32, 26, 8, SKLC.bone, SKLC.boneD, 1.5);
+  box(ctx, ox + 14, oy + 26 + b,  8, 10, 2, SKLC.bone, SKLC.boneD, 1);
+  box(ctx, ox + 42, oy + 26 + b,  8, 10, 2, SKLC.bone, SKLC.boneD, 1);
+  // Eye sockets
+  circ(ctx, ox + 24, oy + 20 + b, 6, SKLC.hollow, OC, 1.5);
+  circ(ctx, ox + 40, oy + 20 + b, 6, SKLC.hollow, OC, 1.5);
+  ctx.save(); ctx.shadowColor = SKLC.eyeC; ctx.shadowBlur = 8;
+  circ(ctx, ox + 24, oy + 20 + b, 3, SKLC.eye,  SKLC.eye,  0);
+  circ(ctx, ox + 40, oy + 20 + b, 3, SKLC.eye,  SKLC.eye,  0);
+  ctx.restore();
+  circ(ctx, ox + 24, oy + 20 + b, 2, SKLC.eyeC, SKLC.eyeC, 0);
+  circ(ctx, ox + 40, oy + 20 + b, 2, SKLC.eyeC, SKLC.eyeC, 0);
+  // Nasal cavity
+  box(ctx, ox + 28, oy + 26 + b, 8, 5, 1, SKLC.hollow, OC, 1);
+  // Teeth
+  for (let t = 0; t < 6; t++) {
+    box(ctx, ox + 17 + t * 5, oy + 32 + b, 4, 4, 1, SKLC.bone, SKLC.boneD, 1);
+  }
+}
+
+export function createSkeletonIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, SKL_FW, SKL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [0,1,0,1].forEach((dy, i) => drawSkeleton(ctx, i * SKL_FW, 0, { bodyDY: dy }));
+  return { canvas: c, frameWidth: SKL_FW, frameHeight: SKL_FH, frameCount: frames };
+}
+export function createSkeletonWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, SKL_FW, SKL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [{bodyDY:2},{bodyDY:0},{bodyDY:2},{bodyDY:0}].forEach((cfg, i) => drawSkeleton(ctx, i * SKL_FW, 0, cfg));
+  return { canvas: c, frameWidth: SKL_FW, frameHeight: SKL_FH, frameCount: frames };
+}
+export function createSkeletonAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, SKL_FW, SKL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [
+    { swordPos: 'normal' },
+    { swordPos: 'raised', bodyDY: -2 },
+    { swordPos: 'raised', bodyDY: -3 },
+    { swordPos: 'normal', bodyDY:  2 },
+  ].forEach((cfg, i) => drawSkeleton(ctx, i * SKL_FW, 0, cfg));
+  return { canvas: c, frameWidth: SKL_FW, frameHeight: SKL_FH, frameCount: frames };
+}
+export function createSkeletonDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, SKL_FW, SKL_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawSkeleton(ctx, i * SKL_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: SKL_FW, frameHeight: SKL_FH, frameCount: frames };
+}
+
+// ── LICHE ANCIENNE ───────────────────────────────────────────────────────────
+const LCH_FW = 64, LCH_FH = 96;
+const LCHC = {
+  robe:   '#0A0A14', robeM:  '#121220', robeD:  '#060608',
+  bone:   '#C0B880', boneD:  '#908860',
+  eye:    '#00CC88', eyeC:   '#00FFAA',
+  staff:  '#1A1008', staffD: '#0A0804',
+  orb:    '#003A1A', orbG:   '#00AA55', orbB:   '#00FF88',
+  decay:  '#1A3A12', decayB: '#44AA33',
+  skull:  '#C4BC80', skullD: '#948C50',
+  hollow: '#080A04',
+};
+
+function drawLich(ctx, ox, oy, {
+  bodyDY = 0, staffPos = 'normal', defending = false,
+} = {}) {
+  const b = bodyDY;
+
+  // Staff (left side)
+  const staffY = staffPos === 'cast' ? oy + 0 + b : oy + 4 + b;
+  box(ctx, ox + 3, staffY, 5, 72, 2, LCHC.staff, LCHC.staffD, 1);
+  ctx.save(); ctx.shadowColor = LCHC.orbG; ctx.shadowBlur = 14;
+  circ(ctx, ox + 5, staffY + 5, 9, LCHC.orb, OC, 1);
+  ctx.restore();
+  circ(ctx, ox + 5, staffY + 5, 6, LCHC.orbG, LCHC.orb, 0);
+  circ(ctx, ox + 5, staffY + 5, 3, LCHC.orbB, LCHC.orbB, 0);
+  poly(ctx, [[ox+1,staffY+4],[ox+5,staffY-4],[ox+9,staffY+4]], LCHC.orbG, LCHC.orbG, 0);
+  poly(ctx, [[ox+2,staffY+3],[ox+5,staffY-2],[ox+8,staffY+3]], LCHC.orbB, LCHC.orbB, 0);
+
+  // Tattered robe bottom
+  poly(ctx, [[ox+14,oy+60+b],[ox+ 8,oy+92+b],[ox+24,oy+82+b]], LCHC.robeD, LCHC.robeD, 0);
+  poly(ctx, [[ox+50,oy+60+b],[ox+56,oy+92+b],[ox+40,oy+82+b]], LCHC.robeD, LCHC.robeD, 0);
+  poly(ctx, [[ox+22,oy+62+b],[ox+18,oy+94+b],[ox+32,oy+80+b]], LCHC.robe,  LCHC.robeD, 0);
+  poly(ctx, [[ox+42,oy+62+b],[ox+46,oy+94+b],[ox+34,oy+80+b]], LCHC.robe,  LCHC.robeD, 0);
+  box(ctx, ox + 24, oy + 62 + b, 16, 30, 0, LCHC.robeM, LCHC.robeD, 0);
+
+  // Body robe
+  box(ctx, ox + 12, oy + 34 + b, 40, 30, 5, LCHC.robeM, LCHC.robeD, 1.5);
+  ctx.save(); ctx.shadowColor = LCHC.orbG; ctx.shadowBlur = 8;
+  circ(ctx, ox + 32, oy + 50 + b, 7, LCHC.orb,  LCHC.orbG, 1.5);
+  circ(ctx, ox + 32, oy + 50 + b, 4, LCHC.orbG, LCHC.orbB, 0);
+  ctx.restore();
+  box(ctx, ox + 12, oy + 46 + b, 40, 2, 0, LCHC.decay,  LCHC.decayB, 0);
+  box(ctx, ox + 12, oy + 58 + b, 40, 2, 0, LCHC.decay,  LCHC.decayB, 0);
+
+  // Arms (bony)
+  box(ctx, ox +  4, oy + 38 + b, 10, 22, 2, LCHC.bone, LCHC.boneD, 1);
+  box(ctx, ox + 50, oy + 38 + b, 10, 22, 2, LCHC.bone, LCHC.boneD, 1);
+  for (let i = 0; i < 3; i++) {
+    fillR(ctx, ox +  5 + i * 2, oy + 58 + b, 2, 5, LCHC.boneD);
+    fillR(ctx, ox + 51 + i * 2, oy + 58 + b, 2, 5, LCHC.boneD);
+  }
+
+  // Cowl
+  box(ctx, ox + 12, oy + 8 + b, 40, 10, 5, LCHC.robeD, OC, 1);
+  poly(ctx, [[ox+12,oy+8+b],[ox+ 0,oy+4+b],[ox+18,oy+14+b]], LCHC.robeD, OC, 1);
+  poly(ctx, [[ox+52,oy+8+b],[ox+64,oy+4+b],[ox+46,oy+14+b]], LCHC.robeD, OC, 1);
+
+  // Skull face
+  box(ctx, ox + 14, oy + 14 + b, 36, 22, 5, LCHC.skull, LCHC.skullD, 1.5);
+  circ(ctx, ox + 24, oy + 22 + b, 6, LCHC.hollow, OC, 1.5);
+  circ(ctx, ox + 40, oy + 22 + b, 6, LCHC.hollow, OC, 1.5);
+  ctx.save(); ctx.shadowColor = LCHC.eyeC; ctx.shadowBlur = 12;
+  circ(ctx, ox + 24, oy + 22 + b, 4, LCHC.eye,  LCHC.eye,  0);
+  circ(ctx, ox + 40, oy + 22 + b, 4, LCHC.eye,  LCHC.eye,  0);
+  ctx.restore();
+  circ(ctx, ox + 24, oy + 22 + b, 2, LCHC.eyeC, LCHC.eyeC, 0);
+  circ(ctx, ox + 40, oy + 22 + b, 2, LCHC.eyeC, LCHC.eyeC, 0);
+  box(ctx, ox + 28, oy + 26 + b, 8, 5, 1, LCHC.hollow, OC, 1);
+  for (let t = 0; t < 5; t++) {
+    box(ctx, ox + 16 + t * 6, oy + 32 + b, 4, 4, 1, LCHC.skull, LCHC.skullD, 1);
+  }
+}
+
+export function createLichIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, LCH_FW, LCH_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [0,1,0,1].forEach((dy, i) => drawLich(ctx, i * LCH_FW, 0, { bodyDY: dy }));
+  return { canvas: c, frameWidth: LCH_FW, frameHeight: LCH_FH, frameCount: frames };
+}
+export function createLichWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, LCH_FW, LCH_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [{bodyDY:1},{bodyDY:-1},{bodyDY:1},{bodyDY:0}].forEach((cfg, i) => drawLich(ctx, i * LCH_FW, 0, cfg));
+  return { canvas: c, frameWidth: LCH_FW, frameHeight: LCH_FH, frameCount: frames };
+}
+export function createLichAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, LCH_FW, LCH_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [
+    { staffPos: 'normal' },
+    { staffPos: 'cast', bodyDY: -2 },
+    { staffPos: 'cast', bodyDY: -3 },
+    { staffPos: 'normal', bodyDY: 2 },
+  ].forEach((cfg, i) => drawLich(ctx, i * LCH_FW, 0, cfg));
+  return { canvas: c, frameWidth: LCH_FW, frameHeight: LCH_FH, frameCount: frames };
+}
+export function createLichDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, LCH_FW, LCH_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawLich(ctx, i * LCH_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: LCH_FW, frameHeight: LCH_FH, frameCount: frames };
+}
+
+// ── TROLL DU GIVRE ────────────────────────────────────────────────────────────
+const FTR_FW = 80, FTR_FH = 96;
+const FTRC = {
+  skin:  '#4A7A90', skinD: '#2A5A70', skinL: '#6A9AB0',
+  ice:   '#AADDFF', iceD:  '#88BBDD',
+  eye:   '#00CCFF', eyeC:  '#AAEEFF',
+  rock:  '#4A6878', rockD: '#2A4858',
+  nail:  '#C8E8FF',
+};
+
+function drawFrostTroll(ctx, ox, oy, {
+  frame = 0, walking = false, attacking = false, defending = false,
+} = {}) {
+  const bobY = walking ? (frame % 2 === 0 ? 2 : -1) : 0;
+  const oy2  = oy + bobY;
+  const armY = attacking ? oy2 + 24 : oy2 + 36;
+
+  // Legs
+  box(ctx, ox + 14, oy2 + 66, 20, 28, 4, FTRC.skin,  FTRC.skinD, 1.5);
+  box(ctx, ox + 46, oy2 + 66, 20, 28, 4, FTRC.skin,  FTRC.skinD, 1.5);
+  box(ctx, ox + 12, oy2 + 86, 24, 10, 2, FTRC.skinD, OC, 1);
+  box(ctx, ox + 44, oy2 + 86, 24, 10, 2, FTRC.skinD, OC, 1);
+  for (let i = 0; i < 3; i++) {
+    fillR(ctx, ox + 14 + i * 6, oy2 + 94, 4, 6, FTRC.nail);
+    fillR(ctx, ox + 46 + i * 6, oy2 + 94, 4, 6, FTRC.nail);
+  }
+
+  // Body
+  box(ctx, ox + 10, oy2 + 36, 60, 34, 6, FTRC.skin, FTRC.skinD, 1.5);
+  // Ice crystals on body
+  ctx.save(); ctx.shadowColor = FTRC.eye; ctx.shadowBlur = 8;
+  poly(ctx, [[ox+22,oy2+38],[ox+18,oy2+30],[ox+26,oy2+38]], FTRC.ice,  FTRC.iceD, 1);
+  poly(ctx, [[ox+56,oy2+40],[ox+52,oy2+32],[ox+60,oy2+40]], FTRC.ice,  FTRC.iceD, 1);
+  poly(ctx, [[ox+38,oy2+42],[ox+35,oy2+34],[ox+41,oy2+42]], FTRC.iceD, FTRC.eye,  1);
+  ctx.restore();
+
+  // Arms
+  box(ctx, ox +  0, armY, 14, 30, 4, FTRC.skin, FTRC.skinD, 1.5);
+  box(ctx, ox + 66, armY, 14, 30, 4, FTRC.skin, FTRC.skinD, 1.5);
+  for (let i = 0; i < 3; i++) {
+    fillR(ctx, ox + 2 + i * 4, armY + 28, 3, 6, FTRC.nail);
+    fillR(ctx, ox + 67 + i * 4, armY + 28, 3, 6, FTRC.nail);
+  }
+
+  // Head
+  box(ctx, ox + 14, oy2 + 4, 52, 34, 6, FTRC.skin, FTRC.skinD, 1.5);
+  box(ctx, ox + 12, oy2 + 4, 56, 12, 3, FTRC.skinD, FTRC.skinD, 0);
+  // Ice crown
+  ctx.save(); ctx.shadowColor = FTRC.eye; ctx.shadowBlur = 6;
+  box(ctx, ox + 12, oy2 + 2, 56, 6, 0, FTRC.rock, FTRC.rockD, 1);
+  for (let i = 0; i < 4; i++) box(ctx, ox + 14 + i * 14, oy2 - 6, 10, 10, 1, FTRC.ice, FTRC.eye, 1);
+  ctx.restore();
+  // Eyes
+  circ(ctx, ox + 28, oy2 + 18, 5, '#003344');
+  circ(ctx, ox + 52, oy2 + 18, 5, '#003344');
+  ctx.save(); ctx.shadowColor = FTRC.eyeC; ctx.shadowBlur = 10;
+  circ(ctx, ox + 28, oy2 + 18, 3, FTRC.eye,  FTRC.eye,  0);
+  circ(ctx, ox + 52, oy2 + 18, 3, FTRC.eye,  FTRC.eye,  0);
+  ctx.restore();
+  // Tusks
+  poly(ctx, [[ox+26,oy2+32],[ox+22,oy2+40],[ox+28,oy2+32]], FTRC.ice,  FTRC.iceD, 1);
+  poly(ctx, [[ox+54,oy2+32],[ox+58,oy2+40],[ox+52,oy2+32]], FTRC.ice,  FTRC.iceD, 1);
+}
+
+export function createFrostTrollIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, FTR_FW, FTR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawFrostTroll(ctx, i * FTR_FW, 0, { frame: i });
+  return { canvas: c, frameWidth: FTR_FW, frameHeight: FTR_FH, frameCount: frames };
+}
+export function createFrostTrollWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, FTR_FW, FTR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawFrostTroll(ctx, i * FTR_FW, 0, { frame: i, walking: true });
+  return { canvas: c, frameWidth: FTR_FW, frameHeight: FTR_FH, frameCount: frames };
+}
+export function createFrostTrollAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, FTR_FW, FTR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawFrostTroll(ctx, i * FTR_FW, 0, { frame: i, attacking: i >= 2 });
+  return { canvas: c, frameWidth: FTR_FW, frameHeight: FTR_FH, frameCount: frames };
+}
+export function createFrostTrollDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, FTR_FW, FTR_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawFrostTroll(ctx, i * FTR_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: FTR_FW, frameHeight: FTR_FH, frameCount: frames };
+}
+
+// ── SORCIÈRE DE GLACE ─────────────────────────────────────────────────────────
+const IW_FW = 64, IW_FH = 88;
+const IWC = {
+  robe:   '#0E1E34', robeD:  '#060E1C', robeM:  '#1A2E48',
+  hair:   '#E8F0FF', hairG:  '#A8C0E0',
+  skin:   '#8090A8', skinL:  '#A0B0C8',
+  eye:    '#00AAFF', eyeC:   '#88DDFF',
+  staff:  '#1A2030', staffD: '#0C1020',
+  orb:    '#0044AA', orbG:   '#0088FF', orbB:   '#88CCFF',
+  ice:    '#AADDFF', iceD:   '#6699CC',
+};
+
+function drawIceWitch(ctx, ox, oy, {
+  bodyDY = 0, staffPos = 'normal', defending = false,
+} = {}) {
+  const b = bodyDY;
+  const staffY = staffPos === 'cast' ? oy + 0 + b : oy + 4 + b;
+
+  // Staff + ice orb
+  box(ctx, ox + 2, staffY, 5, 70, 2, IWC.staff, IWC.staffD, 1);
+  ctx.save(); ctx.shadowColor = IWC.orbG; ctx.shadowBlur = 14;
+  circ(ctx, ox + 4, staffY + 4, 8, IWC.orb, OC, 1);
+  ctx.restore();
+  circ(ctx, ox + 4, staffY + 4, 5, IWC.orbG, IWC.orb, 0);
+  circ(ctx, ox + 4, staffY + 4, 3, IWC.orbB, IWC.orbB, 0);
+  // Ice shards around orb
+  poly(ctx, [[ox+0,staffY+2],[ox+4,staffY-6],[ox+8,staffY+2]], IWC.ice, IWC.iceD, 0);
+  poly(ctx, [[ox-2,staffY+6],[ox+4,staffY-2],[ox+10,staffY+6]], IWC.iceD, IWC.eye, 0);
+
+  // Hair (behind head)
+  poly(ctx, [[ox+16,oy+12+b],[ox+8, oy+2+b],[ox+22,oy+22+b]], IWC.hairG, IWC.hairG, 0);
+  poly(ctx, [[ox+48,oy+12+b],[ox+56,oy+2+b],[ox+42,oy+22+b]], IWC.hairG, IWC.hairG, 0);
+  box(ctx, ox + 14, oy + 6 + b, 36, 14, 4, IWC.hair, IWC.hairG, 1);
+
+  // Head
+  box(ctx, ox + 18, oy + 14 + b, 28, 20, 4, IWC.skin, OC, 1.5);
+  // Eyes
+  ctx.save(); ctx.shadowColor = IWC.eyeC; ctx.shadowBlur = 8;
+  circ(ctx, ox + 26, oy + 22 + b, 4, IWC.eye,  IWC.eye,  0);
+  circ(ctx, ox + 38, oy + 22 + b, 4, IWC.eye,  IWC.eye,  0);
+  ctx.restore();
+  circ(ctx, ox + 26, oy + 22 + b, 2, IWC.eyeC, IWC.eyeC, 0);
+  circ(ctx, ox + 38, oy + 22 + b, 2, IWC.eyeC, IWC.eyeC, 0);
+  // Ice crown
+  ctx.save(); ctx.shadowColor = IWC.eye; ctx.shadowBlur = 6;
+  for (let i = 0; i < 3; i++) {
+    poly(ctx, [[ox+22+i*10,oy+14+b],[ox+24+i*10,oy+8+b],[ox+28+i*10,oy+14+b]], IWC.ice, IWC.eye, 1);
+  }
+  ctx.restore();
+
+  // Body robe
+  box(ctx, ox + 12, oy + 34 + b, 40, 34, 5, IWC.robeM, IWC.robeD, 1.5);
+  // Ice crystal on chest
+  ctx.save(); ctx.shadowColor = IWC.eye; ctx.shadowBlur = 8;
+  poly(ctx, [[ox+29,oy+46+b],[ox+32,oy+38+b],[ox+35,oy+46+b],[ox+32,oy+54+b]], IWC.ice, IWC.eye, 1.5);
+  ctx.restore();
+  // Robe trim
+  box(ctx, ox + 12, oy + 46 + b, 40, 2, 0, IWC.iceD, IWC.eye, 0);
+  box(ctx, ox + 12, oy + 60 + b, 40, 2, 0, IWC.iceD, IWC.eye, 0);
+  // Robe bottom
+  poly(ctx, [[ox+12,oy+68+b],[ox+6, oy+88+b],[ox+20,oy+80+b]], IWC.robeD, IWC.robeD, 0);
+  poly(ctx, [[ox+52,oy+68+b],[ox+58,oy+88+b],[ox+44,oy+80+b]], IWC.robeD, IWC.robeD, 0);
+  box(ctx, ox + 22, oy + 66 + b, 20, 24, 0, IWC.robeM, IWC.robeD, 0);
+
+  // Arms
+  box(ctx, ox + 4,  oy + 38 + b, 10, 22, 2, IWC.skin, OC, 1);
+  box(ctx, ox + 50, oy + 38 + b, 10, 22, 2, IWC.skin, OC, 1);
+}
+
+export function createIceWitchIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, IW_FW, IW_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [0,1,0,1].forEach((dy, i) => drawIceWitch(ctx, i * IW_FW, 0, { bodyDY: dy }));
+  return { canvas: c, frameWidth: IW_FW, frameHeight: IW_FH, frameCount: frames };
+}
+export function createIceWitchWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, IW_FW, IW_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [{bodyDY:1},{bodyDY:-1},{bodyDY:1},{bodyDY:0}].forEach((cfg, i) => drawIceWitch(ctx, i * IW_FW, 0, cfg));
+  return { canvas: c, frameWidth: IW_FW, frameHeight: IW_FH, frameCount: frames };
+}
+export function createIceWitchAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, IW_FW, IW_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [
+    { staffPos: 'normal' }, { staffPos: 'cast', bodyDY: -2 },
+    { staffPos: 'cast', bodyDY: -3 }, { staffPos: 'normal', bodyDY: 2 },
+  ].forEach((cfg, i) => drawIceWitch(ctx, i * IW_FW, 0, cfg));
+  return { canvas: c, frameWidth: IW_FW, frameHeight: IW_FH, frameCount: frames };
+}
+export function createIceWitchDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, IW_FW, IW_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawIceWitch(ctx, i * IW_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: IW_FW, frameHeight: IW_FH, frameCount: frames };
+}
+
+// ── CHEVALIER FANTÔME ────────────────────────────────────────────────────────
+const GHK_FW = 72, GHK_FH = 88;
+const GHKC = {
+  plate:  '#4A5060', plateM: '#5A6070', plateD: '#2A3040',
+  glow:   '#AABBFF', glowB:  '#DDEEFF',
+  eye:    '#88AAFF', eyeC:   '#CCDDFF',
+  ecto:   '#8090B0', ectoD:  '#606880',
+  sword:  '#9090A8', swordD: '#606070', swordE: '#D0D0E8',
+  boot:   '#2A3040',
+};
+
+function drawGhostKnight(ctx, ox, oy, {
+  bodyDY = 0, swordPos = 'normal', defending = false, phase2 = false,
+} = {}) {
+  const b   = bodyDY;
+  const alp = phase2 ? 1.0 : 0.78;
+  ctx.save(); ctx.globalAlpha = alp;
+
+  // Sword (left, behind body)
+  if (!defending) {
+    const sy = swordPos === 'raised' ? oy + 0 + b : oy + 14 + b;
+    box(ctx, ox + 4, sy + 4, 5, 44, 1, GHKC.swordD, OC, 1);
+    box(ctx, ox + 3, sy + 4, 3, 44, 0, GHKC.swordE, GHKC.swordE, 0);
+    box(ctx, ox + 0, sy + 2, 13, 5, 2, GHKC.plate,  GHKC.plateD, 1);
+    ctx.save(); ctx.shadowColor = GHKC.glow; ctx.shadowBlur = 12;
+    fillR(ctx, ox + 5, sy + 4, 3, 44, GHKC.ecto);
+    ctx.restore();
+  }
+
+  // Ectoplasm wisps (ethereal effect)
+  if (!phase2) {
+    ctx.save(); ctx.globalAlpha = 0.35;
+    circ(ctx, ox + 36, oy + 80 + b, 14, GHKC.glow, GHKC.glow, 0);
+    circ(ctx, ox + 20, oy + 75 + b, 8,  GHKC.glow, GHKC.glow, 0);
+    circ(ctx, ox + 52, oy + 72 + b, 6,  GHKC.glow, GHKC.glow, 0);
+    ctx.restore();
+  }
+
+  // Legs
+  box(ctx, ox + 16, oy + 66 + b, 16, 20, 3, GHKC.plate, GHKC.plateD, 1);
+  box(ctx, ox + 40, oy + 66 + b, 16, 20, 3, GHKC.plate, GHKC.plateD, 1);
+  box(ctx, ox + 14, oy + 78 + b, 20,  8, 2, GHKC.boot,  OC, 1);
+  box(ctx, ox + 38, oy + 78 + b, 20,  8, 2, GHKC.boot,  OC, 1);
+
+  // Body
+  box(ctx, ox + 10, oy + 36 + b, 52, 32, 5, GHKC.plate, GHKC.plateD, 1.5);
+  ctx.save(); ctx.shadowColor = GHKC.glow; ctx.shadowBlur = 10;
+  circ(ctx, ox + 36, oy + 52 + b, 7, GHKC.ecto, GHKC.glowB, 1.5);
+  ctx.restore();
+  box(ctx, ox + 12, oy + 48 + b, 48, 2, 0, GHKC.plateD, GHKC.plateD, 0);
+  box(ctx, ox + 12, oy + 60 + b, 48, 2, 0, GHKC.plateD, GHKC.plateD, 0);
+  box(ctx, ox + 10, oy + 64 + b, 52, 5, 2, GHKC.plateD, OC, 1);
+
+  // Shoulders
+  box(ctx, ox +  2, oy + 32 + b, 14, 12, 3, GHKC.plateM, GHKC.plateD, 1);
+  box(ctx, ox + 56, oy + 32 + b, 14, 12, 3, GHKC.plateM, GHKC.plateD, 1);
+
+  // Arms
+  box(ctx, ox +  0, oy + 40 + b, 12, 26, 3, GHKC.plate,  GHKC.plateD, 1);
+  box(ctx, ox + 60, oy + 40 + b, 12, 26, 3, GHKC.plate,  GHKC.plateD, 1);
+  box(ctx, ox +  0, oy + 62 + b, 12,  8, 2, GHKC.plateD, OC, 1);
+  box(ctx, ox + 60, oy + 62 + b, 12,  8, 2, GHKC.plateD, OC, 1);
+
+  // Helmet
+  box(ctx, ox + 14, oy + 10 + b, 44, 28, 4, GHKC.plate, GHKC.plateD, 1.5);
+  box(ctx, ox + 18, oy + 22 + b, 36,  8, 1, GHKC.ecto,  GHKC.plateD, 1);
+  ctx.save(); ctx.shadowColor = GHKC.eyeC; ctx.shadowBlur = 14;
+  circ(ctx, ox + 28, oy + 26 + b, 3, GHKC.eye,  GHKC.eye,  0);
+  circ(ctx, ox + 44, oy + 26 + b, 3, GHKC.eye,  GHKC.eye,  0);
+  ctx.restore();
+  circ(ctx, ox + 28, oy + 26 + b, 2, GHKC.eyeC, GHKC.eyeC, 0);
+  circ(ctx, ox + 44, oy + 26 + b, 2, GHKC.eyeC, GHKC.eyeC, 0);
+  poly(ctx, [[ox+26,oy+10+b],[ox+36,oy+2+b],[ox+46,oy+10+b]], GHKC.plateM, GHKC.plateD, 1);
+
+  ctx.restore();
+}
+
+export function createGhostKnightIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, GHK_FW, GHK_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [0,1,0,1].forEach((dy, i) => drawGhostKnight(ctx, i * GHK_FW, 0, { bodyDY: dy }));
+  return { canvas: c, frameWidth: GHK_FW, frameHeight: GHK_FH, frameCount: frames };
+}
+export function createGhostKnightWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, GHK_FW, GHK_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [{bodyDY:2},{bodyDY:0},{bodyDY:2},{bodyDY:0}].forEach((cfg, i) => drawGhostKnight(ctx, i * GHK_FW, 0, cfg));
+  return { canvas: c, frameWidth: GHK_FW, frameHeight: GHK_FH, frameCount: frames };
+}
+export function createGhostKnightAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, GHK_FW, GHK_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [
+    { swordPos: 'normal' }, { swordPos: 'raised', bodyDY: -2 },
+    { swordPos: 'raised', bodyDY: -3 }, { swordPos: 'normal', bodyDY: 2 },
+  ].forEach((cfg, i) => drawGhostKnight(ctx, i * GHK_FW, 0, cfg));
+  return { canvas: c, frameWidth: GHK_FW, frameHeight: GHK_FH, frameCount: frames };
+}
+export function createGhostKnightDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, GHK_FW, GHK_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawGhostKnight(ctx, i * GHK_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: GHK_FW, frameHeight: GHK_FH, frameCount: frames };
+}
+
+// ── COMTE VAMPIRE ─────────────────────────────────────────────────────────────
+const VAM_FW = 64, VAM_FH = 96;
+const VAMC = {
+  cape:   '#100010', capeM:  '#1A041A', capeD:  '#080008',
+  suit:   '#1A0A1A', suitD:  '#0C040C',
+  skin:   '#C8C0B8', skinD:  '#A8A098',
+  eye:    '#CC0000', eyeC:   '#FF4444',
+  fang:   '#F0EAE0',
+  cravat: '#AA0000',
+  hair:   '#080008',
+  boot:   '#060006',
+};
+
+function drawVampire(ctx, ox, oy, {
+  bodyDY = 0, capeOpen = false, defending = false,
+} = {}) {
+  const b = bodyDY;
+
+  // Cape (behind body, flowing)
+  poly(ctx, [[ox+8, oy+32+b],[ox+0, oy+90+b],[ox+22,oy+78+b]], VAMC.capeM, VAMC.capeD, 0);
+  poly(ctx, [[ox+56,oy+32+b],[ox+64,oy+90+b],[ox+42,oy+78+b]], VAMC.capeM, VAMC.capeD, 0);
+  if (capeOpen) {
+    poly(ctx, [[ox+4, oy+34+b],[ox-4, oy+88+b],[ox+18,oy+74+b]], VAMC.cape, VAMC.capeD, 0);
+    poly(ctx, [[ox+60,oy+34+b],[ox+68,oy+88+b],[ox+46,oy+74+b]], VAMC.cape, VAMC.capeD, 0);
+  }
+
+  // Legs
+  box(ctx, ox + 18, oy + 66 + b, 12, 24, 2, VAMC.suit, VAMC.suitD, 1);
+  box(ctx, ox + 34, oy + 66 + b, 12, 24, 2, VAMC.suit, VAMC.suitD, 1);
+  box(ctx, ox + 16, oy + 82 + b, 16,  8, 2, VAMC.boot, OC, 1);
+  box(ctx, ox + 32, oy + 82 + b, 16,  8, 2, VAMC.boot, OC, 1);
+
+  // Body / suit
+  box(ctx, ox + 14, oy + 34 + b, 36, 34, 4, VAMC.suit, VAMC.suitD, 1.5);
+  // White shirt / cravat
+  box(ctx, ox + 24, oy + 34 + b, 16, 20, 2, '#E8E0D8', '#C0B8B0', 1);
+  ctx.save(); ctx.shadowColor = VAMC.eye; ctx.shadowBlur = 4;
+  box(ctx, ox + 28, oy + 36 + b, 8, 14, 1, VAMC.cravat, '#880000', 1);
+  ctx.restore();
+
+  // Cape collar (on top of body)
+  poly(ctx, [[ox+14,oy+32+b],[ox+10,oy+24+b],[ox+22,oy+36+b]], VAMC.cape, VAMC.capeD, 1);
+  poly(ctx, [[ox+50,oy+32+b],[ox+54,oy+24+b],[ox+42,oy+36+b]], VAMC.cape, VAMC.capeD, 1);
+
+  // Arms
+  box(ctx, ox +  4, oy + 36 + b, 12, 26, 2, VAMC.suit, VAMC.suitD, 1);
+  box(ctx, ox + 48, oy + 36 + b, 12, 26, 2, VAMC.suit, VAMC.suitD, 1);
+  box(ctx, ox +  4, oy + 58 + b, 12,  8, 2, VAMC.skin, VAMC.skinD, 1);
+  box(ctx, ox + 48, oy + 58 + b, 12,  8, 2, VAMC.skin, VAMC.skinD, 1);
+
+  // Head
+  box(ctx, ox + 16, oy + 8 + b, 32, 26, 5, VAMC.skin, VAMC.skinD, 1.5);
+  // Hair
+  box(ctx, ox + 14, oy + 8 + b, 36, 10, 4, VAMC.hair, '#000', 1);
+  // Widow's peak
+  poly(ctx, [[ox+28,oy+8+b],[ox+32,oy+2+b],[ox+36,oy+8+b]], VAMC.hair, OC, 1);
+  // Eyes
+  ctx.save(); ctx.shadowColor = VAMC.eyeC; ctx.shadowBlur = 8;
+  circ(ctx, ox + 25, oy + 20 + b, 4, VAMC.eye,  VAMC.eye,  0);
+  circ(ctx, ox + 39, oy + 20 + b, 4, VAMC.eye,  VAMC.eye,  0);
+  ctx.restore();
+  circ(ctx, ox + 25, oy + 20 + b, 2, VAMC.eyeC, VAMC.eyeC, 0);
+  circ(ctx, ox + 39, oy + 20 + b, 2, VAMC.eyeC, VAMC.eyeC, 0);
+  // Mouth + fangs
+  box(ctx, ox + 22, oy + 28 + b, 20, 4, 1, VAMC.skinD, VAMC.skinD, 0);
+  poly(ctx, [[ox+26,oy+28+b],[ox+24,oy+34+b],[ox+28,oy+29+b]], VAMC.fang, VAMC.skinD, 1);
+  poly(ctx, [[ox+38,oy+28+b],[ox+40,oy+34+b],[ox+36,oy+29+b]], VAMC.fang, VAMC.skinD, 1);
+}
+
+export function createVampireIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, VAM_FW, VAM_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [0,1,0,1].forEach((dy, i) => drawVampire(ctx, i * VAM_FW, 0, { bodyDY: dy }));
+  return { canvas: c, frameWidth: VAM_FW, frameHeight: VAM_FH, frameCount: frames };
+}
+export function createVampireWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, VAM_FW, VAM_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [{bodyDY:1},{bodyDY:-1},{bodyDY:1},{bodyDY:0}].forEach((cfg, i) => drawVampire(ctx, i * VAM_FW, 0, cfg));
+  return { canvas: c, frameWidth: VAM_FW, frameHeight: VAM_FH, frameCount: frames };
+}
+export function createVampireAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, VAM_FW, VAM_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  [
+    {}, { capeOpen: true, bodyDY: -2 },
+    { capeOpen: true, bodyDY: -3 }, { bodyDY: 2 },
+  ].forEach((cfg, i) => drawVampire(ctx, i * VAM_FW, 0, cfg));
+  return { canvas: c, frameWidth: VAM_FW, frameHeight: VAM_FH, frameCount: frames };
+}
+export function createVampireDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, VAM_FW, VAM_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawVampire(ctx, i * VAM_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: VAM_FW, frameHeight: VAM_FH, frameCount: frames };
+}
+
+// ── DÉMONS (GUERRIER & SEIGNEUR) ──────────────────────────────────────────────
+const DMN_FW = 80, DMN_FH = 100;
+const DMNC = {
+  skin:   '#8A1A0A', skinD:  '#5A0A00', skinL:  '#AA3020',
+  armor:  '#2A0808', armorM: '#3A1010', armorD: '#180404',
+  fire:   '#FF4400', fireB:  '#FF8800', fireBr: '#FFCC00',
+  eye:    '#FF2200', eyeC:   '#FF8844',
+  horn:   '#1A0808', hornD:  '#0A0404',
+  sword:  '#6A4820', swordD: '#3A2010', swordE: '#FF6600',
+  wing:   '#280408', wingD:  '#180204',
+  crown:  '#4A0808', crownG: '#AA2020',
+  boot:   '#1A0408',
+};
+
+function drawDemon(ctx, ox, oy, {
+  frame = 0, walking = false, attacking = false, defending = false, lord = false,
+} = {}) {
+  const bobY = walking ? (frame % 2 === 0 ? 2 : -1) : 0;
+  const oy2  = oy + bobY;
+  const bodyW = lord ? 60 : 52;
+  const bodyX = lord ? ox + 10 : ox + 14;
+  const armY  = attacking ? oy2 + 28 : oy2 + 38;
+
+  // Wings (lord only, behind body)
+  if (lord) {
+    poly(ctx, [[ox+10,oy2+36],[ox-10,oy2+14],[ox+4, oy2+60]], DMNC.wing, DMNC.wingD, 1);
+    poly(ctx, [[ox+70,oy2+36],[ox+90,oy2+14],[ox+76,oy2+60]], DMNC.wing, DMNC.wingD, 1);
+    poly(ctx, [[ox+10,oy2+36],[ox-6, oy2+18],[ox+2, oy2+58]], DMNC.wingD, DMNC.wingD, 0);
+    poly(ctx, [[ox+70,oy2+36],[ox+86,oy2+18],[ox+78,oy2+58]], DMNC.wingD, DMNC.wingD, 0);
+  }
+
+  // Legs
+  box(ctx, bodyX + 4,  oy2 + 68, 18, 28, 4, DMNC.skin, DMNC.skinD, 1.5);
+  box(ctx, bodyX + 30, oy2 + 68, 18, 28, 4, DMNC.skin, DMNC.skinD, 1.5);
+  box(ctx, bodyX + 2,  oy2 + 86, 22, 10, 2, DMNC.boot, OC, 1);
+  box(ctx, bodyX + 28, oy2 + 86, 22, 10, 2, DMNC.boot, OC, 1);
+
+  // Body
+  box(ctx, bodyX, oy2 + 36, bodyW, 34, 6, DMNC.skin, DMNC.skinD, 1.5);
+  // Armor plates
+  box(ctx, bodyX + 4, oy2 + 38, bodyW - 8, 26, 3, DMNC.armor, DMNC.armorD, 1);
+  ctx.save(); ctx.shadowColor = DMNC.fire; ctx.shadowBlur = 8;
+  circ(ctx, ox + 40, oy2 + 52, 8, DMNC.armorM, DMNC.fire, 2);
+  circ(ctx, ox + 40, oy2 + 52, 5, DMNC.fire,   DMNC.fireB, 0);
+  ctx.restore();
+  box(ctx, bodyX, oy2 + 64, bodyW, 6, 2, DMNC.armorD, OC, 1);
+
+  // Arms (large)
+  box(ctx, ox +  2, armY, 14, 28, 4, DMNC.skin, DMNC.skinD, 1.5);
+  box(ctx, ox + 64, armY, 14, 28, 4, DMNC.skin, DMNC.skinD, 1.5);
+  // Armor bracers
+  box(ctx, ox +  2, armY + 14, 14, 8, 2, DMNC.armor, DMNC.armorD, 1);
+  box(ctx, ox + 64, armY + 14, 14, 8, 2, DMNC.armor, DMNC.armorD, 1);
+
+  // Flaming sword (right side)
+  const swX = attacking ? ox + 60 : ox + 62;
+  box(ctx, swX, armY + 4, 5, 36, 1, DMNC.sword,  DMNC.swordD, 1);
+  box(ctx, swX - 5, armY, 15, 6,  1, DMNC.swordD, DMNC.swordD, 1);
+  ctx.save(); ctx.shadowColor = DMNC.fire; ctx.shadowBlur = 12;
+  box(ctx, swX + 1, armY + 4, 3, 36, 0, DMNC.fire, DMNC.fire, 0);
+  for (let f = 0; f < 4; f++) {
+    poly(ctx, [[swX+1,armY+8+f*8],[swX+3,armY+4+f*8],[swX+5,armY+8+f*8]], DMNC.fireB, DMNC.fireB, 0);
+  }
+  ctx.restore();
+
+  // Shoulder pads
+  box(ctx, ox +  4, oy2 + 32, 16, 12, 3, DMNC.armorM, DMNC.armorD, 1);
+  box(ctx, ox + 60, oy2 + 32, 16, 12, 3, DMNC.armorM, DMNC.armorD, 1);
+  // Shoulder spikes
+  poly(ctx, [[ox+12, oy2+30],[ox+8,  oy2+22],[ox+16, oy2+30]], DMNC.skinD, OC, 1);
+  poly(ctx, [[ox+68, oy2+30],[ox+72, oy2+22],[ox+64, oy2+30]], DMNC.skinD, OC, 1);
+
+  // Head
+  box(ctx, ox + 18, oy2 + 8, 44, 28, 5, DMNC.skin, DMNC.skinD, 1.5);
+  // Horns
+  poly(ctx, [[ox+22,oy2+8],[ox+14,oy2-8],[ox+28,oy2+10]], DMNC.horn, DMNC.hornD, 1);
+  poly(ctx, [[ox+58,oy2+8],[ox+66,oy2-8],[ox+52,oy2+10]], DMNC.horn, DMNC.hornD, 1);
+  if (lord) {
+    poly(ctx, [[ox+30,oy2+6],[ox+24,oy2-4],[ox+36,oy2+8]], DMNC.horn, DMNC.hornD, 1);
+    poly(ctx, [[ox+50,oy2+6],[ox+56,oy2-4],[ox+44,oy2+8]], DMNC.horn, DMNC.hornD, 1);
+  }
+  // Eyes
+  ctx.save(); ctx.shadowColor = DMNC.eyeC; ctx.shadowBlur = 10;
+  circ(ctx, ox + 28, oy2 + 20, 5, DMNC.eye,  DMNC.eye,  0);
+  circ(ctx, ox + 52, oy2 + 20, 5, DMNC.eye,  DMNC.eye,  0);
+  ctx.restore();
+  circ(ctx, ox + 28, oy2 + 20, 3, DMNC.eyeC, DMNC.eyeC, 0);
+  circ(ctx, ox + 52, oy2 + 20, 3, DMNC.eyeC, DMNC.eyeC, 0);
+  // Maw
+  box(ctx, ox + 26, oy2 + 28, 28, 6, 2, DMNC.skinD, OC, 1);
+  for (let t = 0; t < 5; t++) {
+    poly(ctx, [[ox+27+t*5,oy2+28],[ox+28+t*5,oy2+34],[ox+31+t*5,oy2+28]], DMNC.eyeC, DMNC.skinD, 1);
+  }
+  // Lord crown
+  if (lord) {
+    box(ctx, ox + 16, oy2 + 6, 48, 6, 1, DMNC.crown, DMNC.crownG, 1);
+    ctx.save(); ctx.shadowColor = DMNC.fire; ctx.shadowBlur = 6;
+    for (let i = 0; i < 3; i++) box(ctx, ox + 20 + i * 16, oy2, 10, 8, 1, DMNC.crownG, DMNC.fire, 1);
+    ctx.restore();
+  }
+}
+
+export function createDemonWarriorIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, DMN_FW, DMN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDemon(ctx, i * DMN_FW, 0, { frame: i });
+  return { canvas: c, frameWidth: DMN_FW, frameHeight: DMN_FH, frameCount: frames };
+}
+export function createDemonWarriorWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, DMN_FW, DMN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDemon(ctx, i * DMN_FW, 0, { frame: i, walking: true });
+  return { canvas: c, frameWidth: DMN_FW, frameHeight: DMN_FH, frameCount: frames };
+}
+export function createDemonWarriorAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, DMN_FW, DMN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDemon(ctx, i * DMN_FW, 0, { frame: i, attacking: i >= 2 });
+  return { canvas: c, frameWidth: DMN_FW, frameHeight: DMN_FH, frameCount: frames };
+}
+export function createDemonWarriorDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, DMN_FW, DMN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDemon(ctx, i * DMN_FW, 0, { defending: true });
+  return { canvas: c, frameWidth: DMN_FW, frameHeight: DMN_FH, frameCount: frames };
+}
+
+export function createDemonLordIdleSheet() {
+  const frames = 4, c = makeCanvas(frames, DMN_FW, DMN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDemon(ctx, i * DMN_FW, 0, { frame: i, lord: true });
+  return { canvas: c, frameWidth: DMN_FW, frameHeight: DMN_FH, frameCount: frames };
+}
+export function createDemonLordWalkSheet() {
+  const frames = 4, c = makeCanvas(frames, DMN_FW, DMN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDemon(ctx, i * DMN_FW, 0, { frame: i, walking: true, lord: true });
+  return { canvas: c, frameWidth: DMN_FW, frameHeight: DMN_FH, frameCount: frames };
+}
+export function createDemonLordAttackSheet() {
+  const frames = 4, c = makeCanvas(frames, DMN_FW, DMN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDemon(ctx, i * DMN_FW, 0, { frame: i, attacking: i >= 2, lord: true });
+  return { canvas: c, frameWidth: DMN_FW, frameHeight: DMN_FH, frameCount: frames };
+}
+export function createDemonLordDefendSheet() {
+  const frames = 3, c = makeCanvas(frames, DMN_FW, DMN_FH);
+  const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < frames; i++) drawDemon(ctx, i * DMN_FW, 0, { defending: true, lord: true });
+  return { canvas: c, frameWidth: DMN_FW, frameHeight: DMN_FH, frameCount: frames };
+}
