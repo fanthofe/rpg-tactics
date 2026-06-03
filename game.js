@@ -1,6 +1,7 @@
-import WorldMapScene from './scenes/WorldMapScene.js';
-import TitleScene    from './scenes/TitleScene.js';
-import BattleScene   from './scenes/BattleScene.js';
+import WorldMapScene  from './scenes/WorldMapScene.js';
+import TitleScene     from './scenes/TitleScene.js';
+import BattleScene    from './scenes/BattleScene.js';
+import PrologueScene  from './scenes/PrologueScene.js';
 import BattleUI      from './ui/BattleUI.js';
 import PlayerState   from './battle/PlayerState.js';
 
@@ -14,7 +15,7 @@ const config = {
   backgroundColor: '#06000f',
   pixelArt:        true,
   roundPixels:     true,
-  scene:           [TitleScene, WorldMapScene, BattleScene],
+  scene:           [TitleScene, PrologueScene, WorldMapScene, BattleScene],
 };
 
 window.game     = new Phaser.Game(config);

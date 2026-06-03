@@ -56,7 +56,7 @@ export default class TitleScene extends Phaser.Scene {
       titleEl.classList.remove('visible');
       window.playerState.resetProgress();
       window.playerState.save();
-      this.scene.start('WorldMapScene');
+      this.scene.start('PrologueScene');
     };
 
     if (hasSave) {
