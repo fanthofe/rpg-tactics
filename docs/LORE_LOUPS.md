@@ -16,6 +16,9 @@
 7. [Personnages principaux](#7-personnages-principaux)
 8. [Formes ultimes](#8-formes-ultimes)
 9. [Symbolique — Triades](#9-symbolique--triades)
+10. [Progression des personnages — Level & Character Design](#10-progression-des-personnages--level--character-design)
+11. [Système d'affinité des boss](#11-système-daffinité-des-boss)
+12. [Système de charges d'évolution](#12-système-de-charges-dévolution)
 
 ---
 
@@ -350,6 +353,216 @@ Vael cherche son *Akh* — sa forme vraie, distincte de l'ombre de son père.
 - **Urd** — ce qui a été (le père de Kael, le passé de Vorgäss)
 - **Verdandi** — ce qui devient (les combats, les choix en cours)
 - **Skuld** — ce qui doit être (les formes ultimes, la résolution)
+
+---
+
+## 10. Progression des personnages — Level & Character Design
+
+---
+
+### Kael — *La Puissance qui apprend à exister*
+
+#### Évolution visuelle
+Il commence visuellement **inachevé** — les marquages ancestraux de son clan sont présents mais pâles. Ils s'intensifient et se ramifient non pas à un level-up, mais lors d'un **moment narratif** : la première fois qu'il appelle les ancêtres pour protéger quelqu'un d'autre plutôt que pour se venger.
+
+#### Arc mécanique en trois phases
+
+**Acte I** — Le pouvoir brut sans maîtrise
+- Utilisation des ancêtres coûteuse et limitée (1 charge)
+- Chaque utilisation nourrit Vorgäss — tension permanente
+- Le joueur est tenté de jouer safe et de garder ses charges
+
+**Acte II** — La découverte du lien
+- Ses stats montent mécaniquement quand Sûra et Vael sont en bonne santé
+- Le joueur comprend que protéger les autres est rentable
+- Charges ancestrales +1 à chaque moment narratif clé
+
+**Acte III** — La transformation
+- Le loup-garou est accessible uniquement si les 3 jauges de lien sont au maximum
+- Ce n'est pas un cooldown — c'est une *condition*
+- La transformation n'est pas possible si la meute n'est pas vraiment soudée
+
+> **Tension centrale** : Vorgäss se renforce à chaque utilisation du pouvoir ancestral. Le joueur arbitre entre efficacité immédiate et ne pas nourrir le boss final.
+
+---
+
+### Sûra — *La Force qui apprend à faire confiance*
+
+#### Évolution visuelle
+Posture fermée au départ — oreilles légèrement en arrière, regard oblique. Chaque décision de confiance dans l'histoire modifie subtilement sa posture. Les marquages tribaux du Super Alpha apparaissent progressivement à partir du moment où elle accepte de mener — pas d'être menée.
+
+#### Arc mécanique en trois phases
+
+**Acte I** — La meilleure combattante individuelle, zéro synergie
+- Toutes ses capacités de pack sont verrouillées
+- Le joueur est tenté de la jouer solo — c'est intentionnel, c'est son personnage
+
+**Acte II** — L'émergence du lien
+- Les combos de meute nécessitent qu'elle ait survécu un certain nombre de combats *aux côtés* des autres, pas juste dans la même équipe
+- **Instinct de meute** débloqué : quand un allié tombe sous 25% HP, Sûra peut agir hors de son tour
+
+**Acte III** — Le Super Alpha
+- S'active sur condition narrative : elle doit avoir été en position Alpha lors d'au moins un combat de boss
+- Elle doit avoir *choisi* de mener, pas seulement d'attaquer
+
+> **Tension centrale** : Sûra en Beta est plus puissante à court terme. Sûra en Alpha débloque son arc et des combos de fin de jeu. Le joueur arbitre entre optimisation et progression narrative.
+
+---
+
+### Vael — *La Corruption qui apprend à choisir*
+
+#### Évolution visuelle
+Sa jauge de corruption est **visible sur le sprite** — pas dans l'interface. À corruption basse : pelage gris-argent propre. À corruption haute : veines sombres sur les flancs, pelage perd de sa netteté. La forme Esprit du Loup *inverse* visuellement tout ça — les veines sombres deviennent des tracés lumineux.
+
+#### Arc mécanique en trois phases
+
+**Acte I** — Le plus puissant brut, au prix le plus élevé
+- Capacités Hurlevides = dégâts massifs + corruption monte
+- La jauge descend vite quand la cohésion de meute est haute — récompense active de jouer ensemble
+
+**Acte II** — Vorgäss parle à son fils
+- Si la jauge dépasse 60%, Vorgäss l'influence : fausses infos sur l'ennemi, ou perte de tour
+- **La scène pivot** : Vael avoue ce qu'il est → reset partiel de la jauge + déblocage des premières synergies
+
+**Acte III** — L'Esprit du Loup
+- La forme ultime nécessite **jauge de corruption à zéro** — pas une jauge de lien
+- Le joueur a dû résister à la tentation d'utiliser ses capacités sombres sur toute la fin du jeu
+- La récompense transcende le problème plutôt que de le surmonter
+
+> **Tension centrale** : Vael en mode corruption est redoutable mais instable. Vael en mode lien est plus faible mais ouvre la forme ultime. Les deux chemins doivent rester viables jusqu'au bout.
+
+---
+
+### Tableau de progression de la meute
+
+| Moment narratif | Effet mécanique |
+|---|---|
+| Kael appelle les ancêtres pour protéger un allié | Marquages s'intensifient + charge ancestrale +1 |
+| Sûra joue en Alpha pour la première fois | Combo "Instinct de meute" débloqué |
+| Vael avoue sa nature à Kael | Corruption max -20% + premières synergies |
+| Les trois survivent à un boss ensemble | Jauge de lien permanente +1 cran |
+| Vael résiste à Vorgäss (acte III) | Corruption ne peut plus dépasser 40% |
+| Les trois jauges de lien au max | Transformation de Kael accessible |
+| Sûra a mené au moins un boss en Alpha | Super Alpha accessible |
+| Corruption de Vael à zéro depuis 3 zones | Esprit du Loup accessible |
+
+> Les formes ultimes ne sont pas des récompenses de puissance. Ce sont des récompenses de **cohérence** dans les choix du joueur.
+
+---
+
+## 11. Système d'affinité des boss
+
+---
+
+### Les trois niveaux de récompense
+
+```
+Vaincre le boss                              → XP de meute (tous progressent)
+      +
+Coup de grâce par le loup affinitaire        → Charges d'évolution (lui seul)
+      +
+En position avantageuse au moment du kill    → Bonus de charges
+```
+
+Le joueur doit **préparer le coup final** plutôt que simplement gagner. Gérer les HP ennemis pour amener le bon loup à porter le coup décisif devient une compétence à part entière.
+
+---
+
+### Bosses de Sûra — *L'Affinité des Torrents*
+
+Sûra résonne avec tout ce qui **existe sans permission** — les prédateurs solitaires, les forces qui s'imposent par leur seule nature sans avoir été choisies.
+
+| Boss | Territoire | Pourquoi Sûra | Mécanique signature |
+|---|---|---|---|
+| **La Reine des Rapides** | Rivière des Torrents Noirs | Prédateur de son territoire natal — ce qu'elle aurait pu devenir seule | Invisible un tour sur deux (attaque depuis l'eau) |
+| **La Louve Bannie** | Forêt de l'exil | Miroir de Sûra : rejetée de sa meute, a choisi la destruction | Plus elle perd de HP, plus elle devient forte |
+| **Le Lynx Fantôme** | Cols du glacier | Prédateur solitaire absolu, immunisé aux combos à 3 | Oblige à des stratégies individuelles |
+| **L'Ourse Matriarch** | Plaines du nord | Femelle dominante protectrice — le Super Alpha naturel | Invulnérable tant que ses petits sont en vie |
+
+**Bonus de coup de grâce en Alpha** : Sûra absorbe quelque chose de chaque prédateur solitaire vaincu. Étape concrète vers le Super Alpha qu'on ne lui a jamais donné.
+
+---
+
+### Bosses de Kael — *L'Affinité des Crêtes*
+
+Kael résonne avec tout ce qui **porte le poids de l'histoire** — les gardiens, les héritiers corrompus, les esprits ancestraux mal orientés.
+
+| Boss | Territoire | Pourquoi Kael | Mécanique signature |
+|---|---|---|---|
+| **L'Ancien Gardien** | Skövann corrompu | Ancien Super Alpha piégé — ce que Kael pourrait devenir | Utilise une version dégradée des pouvoirs ancestraux de Kael |
+| **Le Taureau des Crêtes** | Territoire des Crêtes Blanches | Bête sacrée du clan de Kael, rendue folle par la corruption | Charge qui brise les formations — force un changement de position |
+| **Le Spectre du Père** | Zone de transition spirituelle | Manifestation du père corrompue par Vorgäss | Invulnérable aux attaques physiques — uniquement vulnérable au pouvoir ancestral |
+| **Le Colosse de Glace** | Sommet de Skövann | Armé de la puissance volée des ancêtres | Absorbe et retourne les combos de meute |
+
+**Bonus de coup de grâce en Alpha** : Kael libère un fragment d'ancêtre piégé. La charge ancestrale augmente définitivement. Il devient plus lui-même à chaque boss ancestral libéré.
+
+---
+
+### Bosses de Vael — *L'Affinité du Seuil*
+
+Vael résonne avec tout ce qui **existe entre deux états** — les Hurlevides ratés, les créatures coincées entre vie et mort, les miroirs de ce qu'il aurait pu devenir.
+
+| Boss | Territoire | Pourquoi Vael | Mécanique signature |
+|---|---|---|---|
+| **Le Premier Converti** | Ancien territoire de Vorgäss | Premier loup transformé — ce que le rituel donne quand on accepte | Régénère chaque tour — ne peut être tué que par une attaque de Vael |
+| **Le Loup-Miroir** | Zone de corruption maximale | Ce que Vael serait s'il avait accepté l'initiation complète | Copie exactement les actions de Vael du tour précédent |
+| **Le Gardien du Seuil** | Frontière vivants/esprits | Hostile à l'existence hybride de Vael | Immunisé à tout sauf corruption ou vision spirituelle |
+| **L'Ombre de Vorgäss** | Projection spirituelle | Fragment de conscience de Vorgäss — préfigure le combat final | Si corruption de Vael > 60%, Vael ne peut pas l'attaquer |
+
+**Bonus de coup de grâce en Omega** : Chaque boss du seuil vaincu stabilise la corruption. Le plafond de la jauge descend définitivement. Vael se rapproche de la forme Esprit.
+
+---
+
+## 12. Système de charges d'évolution
+
+---
+
+### Fonctionnement
+
+Chaque loup a un arbre de compétences à deux niveaux :
+- **Niveau de base** : débloqué avec l'XP normale de meute
+- **Niveau évolué** : nécessite des charges d'affinité spécifiques
+
+| Condition de kill | Charges obtenues |
+|---|---|
+| Coup de grâce par le loup affinitaire | **+2 charges** |
+| + en position avantageuse | **+1 charge bonus** → total +3 |
+| + sans que les alliés aient attaqué lors du tour final | **+1 charge bonus** → total +4 |
+
+---
+
+### Exemples d'évolutions
+
+**Sûra — Harcèlement**
+- Base : saignement -8 HP/tour pendant 3 tours
+- Évolué (2 charges) : le saignement réduit aussi l'ATK ennemie de 15%
+- Évolué+ (4 charges) : si l'ennemi meurt sous saignement → Sûra agit immédiatement hors tour
+
+**Kael — Appel ancestral**
+- Base : +20% ATK pendant 2 tours
+- Évolué (2 charges) : s'étend aux alliés dans la formation
+- Évolué+ (4 charges) : les ancêtres absorbent 20% des dégâts reçus par la meute ce tour
+
+**Vael — Vision du seuil**
+- Base : révèle les faiblesses de l'ennemi
+- Évolué (2 charges) : affaiblit les défenses ennemies de 20% ce tour
+- Évolué+ (4 charges) : peut être utilisé sur un allié pour annuler une attaque ennemie ciblée
+
+---
+
+### Les quatre tensions stratégiques
+
+**Formation vs. efficacité**
+Un boss de Sûra est plus facile avec elle en Beta (sa position naturelle). Pour le bonus de charges, il faut la mettre en Alpha. Le joueur arbitre entre optimisation du combat et optimisation de la progression.
+
+**Préparation du coup final**
+Il faut finir le boss avec le bon loup — ce qui veut dire ne *pas* le tuer avant. Gérer les HP ennemis pour amener le bon loup au bon moment devient une compétence à part entière.
+
+**Spécialisation vs. polyvalence**
+Plus tu fais vaincre les boss par leur loup affinitaire, plus leurs compétences évoluent vite — au détriment de la progression générale. Un joueur qui veut tout débloquer doit optimiser chaque rencontre. Un joueur détendu progresse quand même, différemment.
+
+**La contrainte de Vael**
+Utiliser ses capacités de corruption contre ses boss affinitaires est tentant (bonus de dégâts). Mais ça monte sa jauge — et L'Ombre de Vorgäss est inaccessible si sa corruption dépasse 60%. Il doit parfois se battre contre ses propres boss sans ses meilleures armes.
 
 ---
 
