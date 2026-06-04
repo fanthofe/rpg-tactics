@@ -19,6 +19,7 @@
 10. [Progression des personnages — Level & Character Design](#10-progression-des-personnages--level--character-design)
 11. [Système d'affinité des boss](#11-système-daffinité-des-boss)
 12. [Système de charges d'évolution](#12-système-de-charges-dévolution)
+13. [Système d'équipement — Les Loups s'incarnent](#13-système-déquipement--les-loups-sincarnent)
 
 ---
 
@@ -563,6 +564,149 @@ Plus tu fais vaincre les boss par leur loup affinitaire, plus leurs compétences
 
 **La contrainte de Vael**
 Utiliser ses capacités de corruption contre ses boss affinitaires est tentant (bonus de dégâts). Mais ça monte sa jauge — et L'Ombre de Vorgäss est inaccessible si sa corruption dépasse 60%. Il doit parfois se battre contre ses propres boss sans ses meilleures armes.
+
+---
+
+---
+
+## 13. Système d'équipement — Les Loups s'incarnent
+
+> **Principe directeur** : les loups ne *portent* pas d'équipement, ils l'*incarnent*. Tout ce qui les équipe vient de la nature, de la chasse, des rituels ou du monde spirituel — jamais d'une forge.
+
+---
+
+### Vue d'ensemble — Les 5 slots
+
+| Slot | Nom | Logique | Spécificité |
+|---|---|---|---|
+| **Tête** | Le Signe | Ce que le loup montre de lui | Universel, fort impact visuel |
+| **Cou** | Le Collier | Capacités actives et passives | Système de fusion par emplacements jumelés |
+| **Pelage** | La Marque de Guerre | Appliquée par un autre loup | Mécanique sociale unique |
+| **Naturel** | Griffes / Crocs | Profil spécifique à chaque loup | Dual-slot Sûra, dual-état Vael |
+| **Trophée** | Mémoire de Chasse | Drops de boss, forme variable | Connecté au système d'affinité |
+
+---
+
+### Slot 1 — Le Couvre-chef : *Le Signe*
+
+Ce que le loup porte sur la tête dit qui il est dans sa tribu. Chaque pièce vient de quelque chose de vaincu ou de sacré.
+
+| Catégorie | Exemples | Effet type |
+|---|---|---|
+| **Totémique** | Plume de Corbeau, Touffe de Lynx | Bonus d'information — révèle les faiblesses ennemies |
+| **Prédateur** | Crâne miniature, Défense de Sanglier | Intimidation — chance que l'ennemi passe son tour |
+| **Ancestral** | Ossement gravé, Écorce runique | Charge ancestrale +1 au départ de chaque combat |
+| **Élémentaire** | Éclat de glacier, Mousse de rivière | Résistance élémentaire + effet passif |
+| **Spirituel** | Œil de pierre, Plume d'esprit | Vael uniquement — améliore la vision du seuil |
+
+---
+
+### Slot 2 — Le Collier : *La Materia Loups*
+
+Le collier est le **socle** (qualités : vigne tressée, cuir, os poli, métal humain trouvé) contenant des **logements de talismans**.
+
+#### Types de talismans
+
+**Prédateur** *(rouge-brun)* — Capacités offensives
+- Dent d'Ours → frappe lourde 1x/combat
+- Griffe de Lynx → SPD +8, esquive +5%
+- Croc de Meute → bonus dégâts si un allié a attaqué avant ce tour
+
+**Esprit** *(bleu-blanc)* — Connexion ancestrale
+- Pierre Ancestrale → recharge 1 charge de Kael par combat
+- Éclat de Skövann → immunité à 1 effet de corruption par combat
+- Os de Gardien → absorbe 15% des dégâts une fois par tour
+
+**Lien** *(vert)* — Synergies de meute
+- Nœud de Meute → +10% aux dégâts de combo
+- Sève Vitale → soin passif 5% HP max/tour si les 3 loups sont en vie
+- Racine d'Union → un combo à 2 loups peut être déclenché même si l'un est à 0 HP
+
+**Seuil** *(gris translucide)* — Spécifique Vael, équipable par les autres
+- Relique Hurlevide → +20% ATK, +corruption (Vael : +10% ATK sans corruption)
+- Œil du Passage → révèle si un ennemi a une nature spirituelle cachée
+- Larme du Seuil → peut affecter des ennemis immunisés au physique
+
+**Trophée** *(doré)* — Drops de boss exclusivement, non craftables
+
+#### Les logements couplés
+
+Les colliers de qualité supérieure ont des **emplacements jumelés**. Deux talismans compatibles dans des emplacements jumelés fusionnent leur effet :
+
+| Fusion | Talismans | Effet combiné |
+|---|---|---|
+| **Frappe Sacrée** | Prédateur + Esprit | Dégâts physiques + ignore les immunités spirituelles |
+| **Rage de Meute** | Lien + Prédateur | Le prochain combo déclenché ignore la DEF ennemie |
+| **Vision de Mort** | Seuil + Esprit | Au tour 1, tous les points faibles ennemis révélés |
+| **Corruption Canalisée** | Seuil + Lien | Vael transfère 10% de sa corruption en bonus de dégâts au prochain attaquant |
+
+---
+
+### Slot 3 — La Marque de Guerre : *L'Équipement Social*
+
+**La mécanique la plus originale du système.** Applicable uniquement hors combat, par un *autre* loup de la meute. La marque est peinte sur le pelage avec des substances naturelles.
+
+> Tu ne peux pas te marquer toi-même. Ça force une interaction concrète entre les personnages — et la marque appliquée par Kael sur Sûra n'a pas exactement le même effet que la même marque appliquée par Vael sur Sûra, parce que le lien entre eux change l'intensité.
+
+| Marque | Substance | Effet | Durée |
+|---|---|---|---|
+| **Boue de Sang** | Argile rouge + herbe amère | Intimidation passive — ATK ennemie -10% | 3 combats |
+| **Argile Blanche** | Craie des crêtes | +1 charge ancestrale + résistance corruption | 4 combats |
+| **Charbon de Sapin** | Cendre de pin | Esquive +8%, invisibilité 1 tour/combat | 3 combats |
+| **Sève Dorée** | Résine d'arbre sacré | Soins reçus +25% | 5 combats |
+| **Limon du Seuil** | Terre des zones corrompues | Vael : corruption ne monte pas au prochain combat | 1 combat |
+
+---
+
+### Slot 4 — Les Armes Naturelles : *Par profil de loup*
+
+Pas des armes portées — des **modifications de ce que le loup est déjà**.
+
+#### Kael — Les Griffes Ancestrales
+
+Ses griffes deviennent des conduits de puissance ancestrale.
+
+| Item | Matière | Effet |
+|---|---|---|
+| Griffes de Pierre Runique | Silex gravé | Chaque attaque physique recharge 0.5 charge ancestrale |
+| Griffes de Lune | Calcaire blanchi, os poli | Ignore 20% DEF ennemie dans les zones nocturnes |
+| Griffes du Grand Hiver | Glace permanente | Attaques ralentissent l'ennemi (-SPD) |
+| Griffes des Ancêtres | Os d'un ancien Super Alpha | 1x/combat : invoque un coup spectral supplémentaire |
+
+#### Sûra — Crocs et Griffes de Chasse (dual-slot)
+
+Deux sous-slots : **crocs** (venin, statut) et **griffes** (vitesse, saignement). Elle peut mixer.
+
+| Item | Type | Matière | Effet |
+|---|---|---|---|
+| Crocs de Rivière | Crocs | Venin de plante aquatique | Empoisonnement + saignement simultanément |
+| Griffes de Rapide | Griffes | Pierre de rivière aiguisée | SPD +10, attaque peut toucher 2 fois si rapide |
+| Crocs de Bannie | Crocs | Acier humain brisé | Brise la défense ennemie sur le coup de grâce |
+| Griffes-Ombre | Griffes | Cuir de lynx + charbon | Bonus si Kael ou Vael a attaqué avant elle ce tour |
+
+#### Vael — Les Instruments du Seuil (dual-état)
+
+Ses armes changent d'effet selon l'état de sa jauge de corruption.
+
+| Item | Type | Effet basse corruption | Effet haute corruption |
+|---|---|---|---|
+| Griffes du Seuil | Griffes | Attaque les entités spirituelles immunisées | Dégâts doublés, jauge +5 |
+| Crocs de Brume | Crocs | "Ralenti spectral" — ennemi perd 1 action | Drain 10% HP ennemi vers Vael |
+| Griffes-Miroir | Griffes | Renvoie 15% des dégâts reçus | Renvoie 30%, Vael subit 10% aussi |
+| Crocs Corrompus | Crocs | Poison ignore résistance magique | Poison + corruption de l'ennemi |
+
+---
+
+### Slot 5 — Les Trophées de Boss : *La Mémoire de la Chasse*
+
+Drop automatique après chaque boss. **La forme dépend de qui a porté le coup de grâce et dans quelle position** — connecté directement au système d'affinité (section 11).
+
+| Boss | Trophée (kill normal) | Trophée (kill affinitaire) | Bonus position avantageuse |
+|---|---|---|---|
+| La Reine des Rapides | Écaille de Rapide (+SPD) | Croc de Reine — venin de rivière permanent | Venin appliqué aux alliés adjacents aussi |
+| L'Ancien Gardien | Fragment de Gardien (+DEF) | Éclat du Gardien — absorbe 1 attaque/combat | L'absorption riposte en dégâts spirituels |
+| Le Premier Converti | Relique Brisée (+ATK) | Sceau du Converti — immunité corruption 1x/combat | L'immunité peut être transférée à un allié |
+| Le Loup-Miroir | Éclat de Miroir (+LCK) | Miroir de Vael — copie la dernière action ennemie | Copie à 1.5× les dégâts |
 
 ---
 
