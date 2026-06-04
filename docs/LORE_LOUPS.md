@@ -20,6 +20,8 @@
 11. [Système d'affinité des boss](#11-système-daffinité-des-boss)
 12. [Système de charges d'évolution](#12-système-de-charges-dévolution)
 13. [Système d'équipement — Les Loups s'incarnent](#13-système-déquipement--les-loups-sincarnent)
+14. [Compétences individuelles et combos](#14-compétences-individuelles-et-combos)
+15. [Système de jauges et d'aura](#15-système-de-jauges-et-daura)
 
 ---
 
@@ -707,6 +709,325 @@ Drop automatique après chaque boss. **La forme dépend de qui a porté le coup 
 | L'Ancien Gardien | Fragment de Gardien (+DEF) | Éclat du Gardien — absorbe 1 attaque/combat | L'absorption riposte en dégâts spirituels |
 | Le Premier Converti | Relique Brisée (+ATK) | Sceau du Converti — immunité corruption 1x/combat | L'immunité peut être transférée à un allié |
 | Le Loup-Miroir | Éclat de Miroir (+LCK) | Miroir de Vael — copie la dernière action ennemie | Copie à 1.5× les dégâts |
+
+---
+
+---
+
+## 14. Compétences individuelles et combos
+
+> Style Chrono Trigger — compétences individuelles par loup, combos à 2 et combos à 3, connectés aux affinités d'évolution et aux liens narratifs.
+
+---
+
+### KAEL — Charges Ancestrales (CA)
+
+| Nom | Rang | Coût | Description | Condition |
+|---|---|---|---|---|
+| **Frappe de Meute** | 1 | 0 CA | Attaque + bonus si un allié a attaqué ce tour | Départ |
+| **Griffe Runique** | 1 | 1 CA | Frappe qui ignore 30% DEF — les ancêtres guident le coup | Départ |
+| **Abri des Crêtes** | 1 | 1 CA | Protège un allié ce tour — absorbe les dégâts à sa place | Niveau 4 |
+| **Mémoire du Clan** | 2 | 2 CA | Invoque un ancêtre aléatoire — buff imprévisible mais toujours positif | Niveau 7 |
+| **Rugissement du Chef** | 2 | 2 CA | ATK +25% pour toute la meute pendant 2 tours | Avoir joué Alpha sur un boss |
+| **Lien de Sang** | 2 | 2 CA | Égalise les HP entre Kael et un allié | 2 charges d'affinité |
+| **Frappe des Esprits** | 3 | 3 CA | Dégâts spirituels massifs + brise les défenses Hurlevides | 4 charges d'affinité |
+| **Incarnation** | 3 | 5 CA | Déclenche la forme Loup-Garou 3 tours *(prérequis : jauges de lien max)* | Fin Acte III |
+
+---
+
+### SÛRA — Marques de Chasse (MC)
+
+| Nom | Rang | Coût | Description | Condition |
+|---|---|---|---|---|
+| **Traque** | 1 | 0 | Attaque + saignement (−8 HP/tour, 3 tours) | Départ |
+| **Flanc Rapide** | 1 | 1 MC | Bonus de dégâts si l'ennemi a déjà un débuff actif | Départ |
+| **Pas d'Ombre** | 1 | 0 | Esquive tout ce tour + contre-attaque la prochaine frappe | Niveau 5 |
+| **Venin des Torrents** | 2 | 2 MC | Poison + saignement simultanément *(amplifié par Crocs de Rivière)* | Vaincre La Reine des Rapides |
+| **Marquage** | 2 | 2 MC | ATK ennemie −30% pendant 3 tours + bloque capacités spéciales | Vaincre La Louve Bannie |
+| **Frénésie de Chasse** | 2 | 3 MC | 2 tours : chaque attaque frappe 2 fois, sans pouvoir se défendre | 2 charges d'affinité |
+| **Rugissement de Bannie** | 3 | 4 MC | Stun 1 tour + ATK −40% les 2 tours suivants | 3 charges d'affinité |
+| **Dominance** | 3 | 4 MC | Déclenche le Super Alpha 3 tours *(prérequis : avoir mené un boss en Alpha)* | Fin Acte III |
+
+---
+
+### VAEL — Jauge du Seuil (JC, bidirectionnelle)
+
+| Nom | Rang | Coût | Description | Condition |
+|---|---|---|---|---|
+| **Regard du Seuil** | 1 | 0 | Révèle HP, faiblesses et résistances de l'ennemi | Départ |
+| **Morsure Corrompue** | 1 | +10 JC | Attaque + contamination (−5% HP/tour, 3 tours) | Départ |
+| **Pas Fantôme** | 1 | 0 | Change de position dans la formation sans dépenser de tour | Niveau 4 |
+| **Drain d'Âme** | 2 | −15 JC | Vole HP à l'ennemi (amplifié si corrompu) | Scène de confession (narratif) |
+| **Voile des Mondes** | 2 | −20 JC | Toute la meute immunisée aux attaques physiques ce tour | Niveau 8 |
+| **Possession Partielle** | 2 | +25 JC | L'ennemi attaque son propre camp ce tour *(JC > 50% requis)* | 2 charges d'affinité |
+| **Exorcisme du Seuil** | 3 | −30 JC | Détruit tous les buffs Hurlevides + dégâts massifs *(JC < 20% requis)* | 3 charges d'affinité |
+| **Transcendance** | 3 | −JC totale | Déclenche l'Esprit du Loup 3 tours *(prérequis : JC à 0 depuis 3 zones)* | Fin Acte III |
+
+---
+
+### Combos à 2 loups
+
+#### Kael + Sûra — *La Tension Productive*
+
+| Nom | Conditions | Description |
+|---|---|---|
+| **Tactique du Clan** | Kael Alpha, Sûra Beta | Kael neutralise, Sûra exécute — critique garanti + saignement + ATK ennemie −20% |
+| **Alliance de Sang** | L'un < 30% HP | L'autre attaque à 2× ATK, le blessé régénère 20% HP |
+| **Abri et Croc** | Kael utilise Abri sur Sûra | Sûra attaque sans risque de contre-attaque, +40% dégâts |
+| **Le Poids Partagé** | Déblocage narratif Acte II | Dégâts proportionnels aux HP totaux perdus dans ce combat |
+| **Rage et Raison** | Sûra en Frénésie + Kael 2 CA | Kael canalise la frénésie — dégâts ×2.5, Sûra garde sa défense |
+
+#### Kael + Vael — *Le Passé et l'Entre-Deux*
+
+| Nom | Conditions | Description |
+|---|---|---|
+| **Signal Ancestral** | Vael Regard du Seuil puis Kael attaque | Ignore toutes les défenses + 50% chance stun |
+| **Pont des Mondes** | 2 CA + JC < 40% | Ancêtre invoqué attaque physiquement pendant 2 tours |
+| **Sceau du Père** | Boss Hurlevide uniquement | Supprime tous les effets de corruption + dégâts aux Hurlevides |
+| **Héritage Brisé** | Narratif — après la confession | Attaque combinée + immunité peur/stun 3 tours |
+| **Lune et Cendre** | Kael Loup-Garou + Vael JC 0 | Attaque deux phases — physique + spirituelle, ignore immunités |
+
+#### Sûra + Vael — *L'Improbable*
+
+| Nom | Conditions | Description |
+|---|---|---|
+| **Harcèlement Spectral** | Sûra Traque + Vael Morsure Corrompue | Double frappe simultanée physique et spirituelle |
+| **Relais de Prédateurs** | Sûra attaque (esquivée ou non) | Si esquivée, Vael contre-attaque depuis le monde des esprits — inévitable |
+| **Ombre et Croc** | Vael Voile des Mondes + Sûra | Sûra attaque depuis le monde des esprits — multiplicateur surprise, pas de riposte |
+| **Ce Qu'On Refuse** | Narratif Acte III | Détruit spécifiquement le statut "immunisé" de n'importe quel ennemi |
+| **Venin du Seuil** | Sûra Venin + Vael JC > 50% | Empoisonnement amplifié qui affecte aussi les entités spirituelles |
+
+---
+
+### Combos à 3 loups
+
+#### Combos de cohésion
+
+| Nom | Positions | Description |
+|---|---|---|
+| **Hurlement Coordonné** | Toutes formations | Dégâts de zone + peur 2 tours sur tous les ennemis — 1x/combat |
+| **Formation Naturelle** | Kael Alpha, Sûra Beta, Vael Omega | +20% stats meute 3 tours + recharge partielle des jauges |
+| **Relais Total** | Automatique | Si un loup tombe à 0 HP : les 2 autres agissent hors tour + regagnent 15% HP |
+| **Meute Inversée** | Vael Alpha, Sûra Beta, Kael Omega | L'ennemi passe son prochain tour |
+
+#### Combos narratifs
+
+| Nom | Condition | Description |
+|---|---|---|
+| **Les Trois Fils** | Fin Acte II — révélation sur Vorgäss | Dégâts 3× + perce toutes les résistances. *Chacun frappe pour ce qu'il a perdu* |
+| **Ce Que Skövann Gardait** | Premier retour à Skövann corrompu | Purge la corruption — Hurlevides −50% ATK pour le reste du combat |
+| **La Meute Impossible** | Tous les combos à 2 débloqués | Les 3 attaquent comme si chacun était en position avantageuse |
+
+#### Combos de formes ultimes
+
+| Nom | Prérequis | Description |
+|---|---|---|
+| **Les Trois Axes** | Kael Loup-Garou + Sûra Super Alpha + Vael Esprit | 3 phases séquentielles — chaque phase multiplie la suivante |
+| **Skövann Vivant** | Les 3 en forme ultime simultanément | Les ancêtres libérés buffent toute la meute — 1x par partie |
+| **Ce Pour Quoi On Est Là** | Combat contre Vorgäss uniquement | Les 3 en formes ultimes, positions avantageuses simultanées. Résultat narratif variable |
+
+---
+
+## 15. Système de jauges et d'aura
+
+> Inspiré du système de densification d'Octopath Traveler — la jauge représente l'état intérieur du loup, pas seulement une ressource.
+
+---
+
+### Schéma 1 — La boucle de tour
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      DÉBUT DE COMBAT                            │
+│                                                                 │
+│   ┌──────────┐     ┌──────────┐     ┌──────────┐              │
+│   │  KAEL    │     │  SÛRA    │     │  VAEL    │              │
+│   │  Alpha?  │     │  Beta?   │     │  Omega?  │              │
+│   └──────────┘     └──────────┘     └──────────┘              │
+│        └──────────────────┬──────────────┘                     │
+│                    CHOISIR FORMATION                            │
+│              (avant chaque combat, non modifiable)             │
+└─────────────────────────────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      BOUCLE DE TOUR                             │
+│                                                                 │
+│  Alpha joue → Beta joue → Omega joue → Ennemi joue → [repeat] │
+│                                                                 │
+│  ┌─────────────┬──────────────────┬──────────────────────┐    │
+│  │  ATTAQUE    │   COMPÉTENCE     │       COMBO          │    │
+│  │  de base    │   (coûte jauge)  │  (2 ou 3 loups)      │    │
+│  │  → remplit  │  → densification │  → conditions        │    │
+│  │    jauge +1 │    d'aura        │    spécifiques       │    │
+│  └─────────────┴──────────────────┴──────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Schéma 2 — Les trois jauges
+
+```
+KAEL — Charges Ancestrales (CA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SE REMPLIT :                    AURA : Bleu glacier, tracés géométriques
+  ├─ protège un allié  → +1 CA
+  ├─ absorbe un coup   → +1 CA   [○○○○○] vide      → pas d'aura
+  └─ skill ancestral   → +1 CA   [●●○○○] 2/5       → aura légère
+                                  [●●●●○] 4/5       → aura dense
+  MAX : 5 CA                      [●●●●●] pleine    → aura vibrante
+  DÉCROIT : si Vorgäss influence                    → ciblé par Hurlevides
+
+─────────────────────────────────────────────────────────────────
+
+SÛRA — Marques de Chasse (MC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SE REMPLIT :                    AURA : Ambre électrique, ondulations
+  ├─ inflige des dégâts → +1 MC
+  ├─ applique débuff    → +1 MC   [○○○○] vide      → pas d'aura
+  └─ esquive            → +2 MC   [●●○○] 2/4       → aura fluide
+                                  [●●●●] pleine    → aura explosive
+  MAX : 4 MC                                       → attaque amplifiée
+  DÉCROIT : aucun dégât pendant 3 tours
+
+─────────────────────────────────────────────────────────────────
+
+VAEL — Jauge du Seuil (JC) ← BIDIRECTIONNELLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  JC basse (corruption < 40%)      JC haute (corruption > 60%)
+  ┌───────────────────────┐        ┌───────────────────────┐
+  │ Aura : argent + vert  │        │ Aura : violet pulsant │
+  │ Skills ESPRIT actifs  │        │ Skills HURLEVIDE actifs│
+  │ Drain d'Âme           │        │ Possession Partielle  │
+  │ Voile des Mondes      │        │ Morsure Corrompue     │
+  │ Exorcisme du Seuil    │        │ Griffes du Seuil ×2   │
+  └───────────────────────┘        └───────────────────────┘
+    Consommer jauge → −corruption    Consommer jauge → +corruption
+```
+
+---
+
+### Schéma 3 — Formation et effets
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐           │
+│  │    ALPHA    │   │    BETA     │   │    OMEGA    │           │
+│  │  1er tour   │   │  2e tour    │   │  3e tour    │           │
+│  │ Commande &  │   │ Attaque &   │   │ Support &   │           │
+│  │ intimidation│   │ exécution   │   │ adaptation  │           │
+│  └─────────────┘   └─────────────┘   └─────────────┘           │
+└──────────────────────────────────────────────────────────────────┘
+
+  KAEL   → Alpha naturel  [●●] jauge ×1.5  │  hors-position : combos spéciaux
+  SÛRA   → Beta naturel   [●●] jauge ×1.5  │  hors-position : combos spéciaux
+  VAEL   → Omega naturel  [●●] jauge ×1.5  │  hors-position : combos spéciaux
+
+  ⚠ TENSION CENTRALE :
+  Position naturelle (jauge rapide)  ≠  Position pour combo ou bonus boss
+```
+
+---
+
+### Schéma 4 — Arbre de décision des combos
+
+```
+                    MON TOUR — JE VEUX UN COMBO
+                               │
+                ┌──────────────┴──────────────┐
+                ▼                             ▼
+          COMBO À 2                      COMBO À 3
+               │                              │
+     ┌─────────┼─────────┐            LES 3 JAUGES PLEINES ?
+     ▼         ▼         ▼                    │
+  K + S     K + V     S + V           ┌───────┴───────┐
+  5 combos  5 combos  5 combos       OUI             NON
+               │                      │               │
+  CONDITION VÉRIFIÉE ?          RÉSONANCE ×3     Construire
+        │                       Triple tech       la jauge
+   ┌────┴────┐                  disponible        +X/action
+  OUI       NON                 (1 tour)
+   │         │
+DÉCLENCHER  Continuer
+ → AURA se densifie sur les loups impliqués
+ → EFFET VISUEL + MÉCANIQUE
+```
+
+---
+
+### Schéma 5 — Progression vers les formes ultimes
+
+```
+KAEL → Loup-Garou
+  Lien KAEL↔SÛRA max + Lien KAEL↔VAEL max + Abri utilisé
+                    │
+             Jauge en VIBRATION (pulse, instable)
+                    │
+             5 CA → TRANSFORMATION (3 tours)
+
+SÛRA → Super Alpha
+  Avoir joué Alpha sur un boss + Instinct de Meute déclenché + 3 charges
+                    │
+             Jauge en VIBRATION (électrique incontrôlée)
+                    │
+             4 MC → TRANSFORMATION (3 tours)
+
+VAEL → Esprit du Loup
+  Corruption à 0 + Résistance à Vorgäss + 3 zones à JC 0
+                    │
+             Jauge en VIBRATION (se dédouble : physique + spirituelle)
+                    │
+             Jauge totale → TRANSFORMATION (3 tours)
+```
+
+---
+
+### Schéma 6 — Vue globale simplifiée
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                    BOUCLE COMPLÈTE EN UN COUP D'ŒIL               │
+│                                                                    │
+│  AVANT LE COMBAT                                                   │
+│  └── Choisir formation (Alpha / Beta / Omega) → impacte combos    │
+│                                                                    │
+│  PENDANT LE COMBAT                                                 │
+│  ├─ Action basique  → remplit jauge (+1 à +2)                      │
+│  ├─ Compétence      → vide jauge → AURA densifiée → effet         │
+│  ├─ Combo à 2       → 2 jauges partielles suffisent               │
+│  └─ Combo à 3       → 3 jauges pleines = RÉSONANCE                │
+│                                                                    │
+│  SPÉCIFICITÉS PAR LOUP                                             │
+│  ├─ Kael  : lente, grosse récompense, ancestral                   │
+│  ├─ Sûra  : rapide, fréquente, instinct                           │
+│  └─ Vael  : DOUBLE selon corruption — risque/récompense           │
+│                                                                    │
+│  PROGRESSION LONG TERME                                            │
+│  ├─ Boss affinitaire → charges d'évolution → skills évoluent      │
+│  ├─ Lien de confiance → combos narratifs débloqués                │
+│  └─ Conditions remplies → jauge vibre → FORME ULTIME              │
+│                                                                    │
+│  ENTRE LES COMBATS                                                 │
+│  └─ HP : 100% − 30% repos │ Jauge : conservée à 50%              │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Les 9 perspectives d'utilisation de la jauge
+
+| # | Perspective | Nature | Apport |
+|---|---|---|---|
+| 1 | **Remplissage différencié** | Mécanique | Chaque loup joue à sa façon |
+| 2 | **Signal stratégique** | Risque/récompense | L'aura pleine attire les ennemis |
+| 3 | **Don de jauge** | Social | Sacrifice ses charges pour un allié |
+| 4 | **Résonance à 3** | Coordination | Récompense la synchronisation |
+| 5 | **Décroissance contextuelle** | Environnemental | Le monde influence la vitesse de remplissage |
+| 6 | **Mémoire entre combats** | Progression | 50% des charges conservées |
+| 7 | **Aura comme relation** | Narratif | Les liens visibles mécaniquement |
+| 8 | **Vael dual-aura** | Complexité | Deux kits selon l'état de corruption |
+| 9 | **Vibration pré-transformation** | Signal narratif | La forme ultime annoncée visuellement |
 
 ---
 
