@@ -31,7 +31,7 @@ export default class WorldMapScene extends Phaser.Scene {
   }
 
   create(data = {}) {
-    const ps = window.playerState;
+    const ps = window.wolfState;
 
     if (data.clearedVillage) ps.clearVillage(data.clearedVillage);
 
@@ -87,7 +87,7 @@ export default class WorldMapScene extends Phaser.Scene {
   // ── Paths ──────────────────────────────────────────────────────────────────
 
   _drawPaths() {
-    const ps = window.playerState;
+    const ps = window.wolfState;
     const g  = this._pathGfx;
     g.clear();
 
@@ -134,7 +134,7 @@ export default class WorldMapScene extends Phaser.Scene {
   // ── Nodes ──────────────────────────────────────────────────────────────────
 
   _drawNodes() {
-    const ps = window.playerState;
+    const ps = window.wolfState;
     const g  = this._nodeGfx;
     g.clear();
 
@@ -193,7 +193,7 @@ export default class WorldMapScene extends Phaser.Scene {
         frameRate: 4, repeat: -1,
       });
     }
-    const { x, y } = VILLAGES[window.playerState.currentVillage].pos;
+    const { x, y } = VILLAGES[window.wolfState.currentVillage].pos;
     this._heroSpr = this.add.sprite(x, y - NODE_R - 12, 'hero-idle')
       .setScale(0.32)
       .setDepth(10);
@@ -208,7 +208,7 @@ export default class WorldMapScene extends Phaser.Scene {
     const menuBtn = document.getElementById('btn-map-menu');
     menuBtn.classList.add('visible');
     menuBtn.onclick = () => this._showMenuConfirm();
-    this._menuUI = new MenuUI(window.playerState);
+    this._menuUI = new MenuUI(window.wolfState);
 
     equipBtn.onclick = () => this._menuUI.show();
     document.getElementById('btn-close-menu').onclick = () => this._menuUI.hide();
@@ -239,7 +239,7 @@ export default class WorldMapScene extends Phaser.Scene {
 
   _onNodeClick(villageId) {
     if (this._animating) return;
-    const ps = window.playerState;
+    const ps = window.wolfState;
 
     if (villageId === ps.currentVillage) {
       this._openVillagePanel(villageId);
@@ -266,7 +266,7 @@ export default class WorldMapScene extends Phaser.Scene {
       duration: 320,
       ease: 'Sine.easeInOut',
       onComplete: () => {
-        window.playerState.currentVillage = villageId;
+        window.wolfState.currentVillage = villageId;
         this._animating = false;
         this._refreshNodes();
         this._openVillagePanel(villageId);
@@ -285,7 +285,7 @@ export default class WorldMapScene extends Phaser.Scene {
   // ── Village panel ──────────────────────────────────────────────────────────
 
   _openVillagePanel(villageId) {
-    const ps      = window.playerState;
+    const ps      = window.wolfState;
     const village = VILLAGES[villageId];
     if (!village) return;
 
@@ -330,9 +330,8 @@ export default class WorldMapScene extends Phaser.Scene {
     if (this._menuUI) this._menuUI.hide();
     document.getElementById('btn-map-equip').classList.remove('visible');
     document.getElementById('btn-map-menu').classList.remove('visible');
-    document.getElementById('ui-overlay').style.display = '';
 
-    this.scene.start('BattleScene', { villageId, seqIdx: 0 });
+    this.scene.start('FormationScene', { villageId, seqIdx: 0 });
   }
 
   // ── Menu confirmation ──────────────────────────────────────────────────────
